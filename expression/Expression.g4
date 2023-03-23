@@ -88,7 +88,7 @@ StringCharacter
 
 fragment
 EscapeSequence
-    : '\\'[btnfr"'\\]
+    : '\\'[abtnfr"'\\]
     | HexEscape
     ;
 
