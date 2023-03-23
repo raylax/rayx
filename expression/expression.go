@@ -29,8 +29,25 @@ func (l *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
 	fmt.Println(ctx.GetText())
 }
 
-func (e *Environment) Eval(expression string) error {
+func (e *Environment) Verify(expression string) (err error) {
+	_, err = e.parse(expression)
+	return
+}
 
+func (e *Environment) Eval(expression string) (any, error) {
+	expr, err := e.parse(expression)
+	if err != nil {
+		return nil, err
+	}
+	visitor := &evaluator{env: e}
+	val := expr.Accept(visitor)
+	if visitor.err != nil {
+		return nil, err
+	}
+	return val, nil
+}
+
+func (e *Environment) parse(expression string) (IExpressionContext, error) {
 	input := antlr.NewInputStream(expression)
 	lexer := NewExpressionLexer(input)
 	stream := antlr.NewCommonTokenStream(lexer, 0)
@@ -42,12 +59,10 @@ func (e *Environment) Eval(expression string) error {
 	expr := parser.Expression()
 
 	if parserErrorListener.Err != nil {
-		return parserErrorListener.Err
+		return nil, parserErrorListener.Err
 	}
 
-	antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), expr)
-
-	return nil
+	return expr, nil
 }
 
 type parserErrorListener struct {

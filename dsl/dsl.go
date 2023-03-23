@@ -9,13 +9,13 @@ import (
 type Raw = map[string]any
 
 type Poc struct {
-	Name       string      `yaml:"name"`
-	Manual     bool        `yaml:"manual"`
-	Transport  string      `yaml:"transport"`
-	Set        *Set        `yaml:"set"`
-	Rules      *Rules      `yaml:"rules"`
-	Expression *Expression `yaml:"expression.go"`
-	Detail     *Detail     `yaml:"detail"`
+	Name       string  `yaml:"name"`
+	Manual     bool    `yaml:"manual"`
+	Transport  string  `yaml:"transport"`
+	Set        *Set    `yaml:"set"`
+	Rules      *Rules  `yaml:"rules"`
+	Expression string  `yaml:"expression"`
+	Detail     *Detail `yaml:"detail"`
 }
 
 type Detail struct {
@@ -38,18 +38,16 @@ func (d *Detail) UnmarshalYAML(value *yaml.Node) error {
 	return mapstructure.Decode(d.raw, d)
 }
 
-type Expression string
-
-type Set map[string]Expression
+type Set map[string]string
 
 type Rules map[string]Rule
 
 type Header map[string]string
 
 type Rule struct {
-	Request    *Request    `yaml:"request"`
-	Expression *Expression `yaml:"expression.go"`
-	Output     *Output     `yaml:"output,omitempty"`
+	Request    *Request `yaml:"request"`
+	Expression string   `yaml:"expression"`
+	Output     *Output  `yaml:"output,omitempty"`
 }
 
 type Request struct {
@@ -61,7 +59,7 @@ type Request struct {
 	Body            string `yaml:"body"`
 }
 
-type Output map[string]Expression
+type Output map[string]string
 
 func ParsePoc(path string) (*Poc, error) {
 	poc := &Poc{}

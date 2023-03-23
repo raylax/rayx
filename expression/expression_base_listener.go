@@ -32,6 +32,12 @@ func (s *BaseExpressionListener) EnterChainExpression(ctx *ChainExpressionContex
 // ExitChainExpression is called when production ChainExpression is exited.
 func (s *BaseExpressionListener) ExitChainExpression(ctx *ChainExpressionContext) {}
 
+// EnterPlusExpression is called when production PlusExpression is entered.
+func (s *BaseExpressionListener) EnterPlusExpression(ctx *PlusExpressionContext) {}
+
+// ExitPlusExpression is called when production PlusExpression is exited.
+func (s *BaseExpressionListener) ExitPlusExpression(ctx *PlusExpressionContext) {}
+
 // EnterLogicalAndExpression is called when production LogicalAndExpression is entered.
 func (s *BaseExpressionListener) EnterLogicalAndExpression(ctx *LogicalAndExpressionContext) {}
 
@@ -49,6 +55,12 @@ func (s *BaseExpressionListener) EnterLogicalOrExpression(ctx *LogicalOrExpressi
 
 // ExitLogicalOrExpression is called when production LogicalOrExpression is exited.
 func (s *BaseExpressionListener) ExitLogicalOrExpression(ctx *LogicalOrExpressionContext) {}
+
+// EnterParenExpression is called when production ParenExpression is entered.
+func (s *BaseExpressionListener) EnterParenExpression(ctx *ParenExpressionContext) {}
+
+// ExitParenExpression is called when production ParenExpression is exited.
+func (s *BaseExpressionListener) ExitParenExpression(ctx *ParenExpressionContext) {}
 
 // EnterObjectAccessExpression is called when production ObjectAccessExpression is entered.
 func (s *BaseExpressionListener) EnterObjectAccessExpression(ctx *ObjectAccessExpressionContext) {}
@@ -82,11 +94,29 @@ func (s *BaseExpressionListener) EnterIdentifierAccessExpression(ctx *Identifier
 func (s *BaseExpressionListener) ExitIdentifierAccessExpression(ctx *IdentifierAccessExpressionContext) {
 }
 
-// EnterExpressionConst is called when production expressionConst is entered.
-func (s *BaseExpressionListener) EnterExpressionConst(ctx *ExpressionConstContext) {}
+// EnterBinaryStringLiteral is called when production BinaryStringLiteral is entered.
+func (s *BaseExpressionListener) EnterBinaryStringLiteral(ctx *BinaryStringLiteralContext) {}
 
-// ExitExpressionConst is called when production expressionConst is exited.
-func (s *BaseExpressionListener) ExitExpressionConst(ctx *ExpressionConstContext) {}
+// ExitBinaryStringLiteral is called when production BinaryStringLiteral is exited.
+func (s *BaseExpressionListener) ExitBinaryStringLiteral(ctx *BinaryStringLiteralContext) {}
+
+// EnterStringLiteral is called when production StringLiteral is entered.
+func (s *BaseExpressionListener) EnterStringLiteral(ctx *StringLiteralContext) {}
+
+// ExitStringLiteral is called when production StringLiteral is exited.
+func (s *BaseExpressionListener) ExitStringLiteral(ctx *StringLiteralContext) {}
+
+// EnterIntegerLiteral is called when production IntegerLiteral is entered.
+func (s *BaseExpressionListener) EnterIntegerLiteral(ctx *IntegerLiteralContext) {}
+
+// ExitIntegerLiteral is called when production IntegerLiteral is exited.
+func (s *BaseExpressionListener) ExitIntegerLiteral(ctx *IntegerLiteralContext) {}
+
+// EnterFloatingPointLiteral is called when production FloatingPointLiteral is entered.
+func (s *BaseExpressionListener) EnterFloatingPointLiteral(ctx *FloatingPointLiteralContext) {}
+
+// ExitFloatingPointLiteral is called when production FloatingPointLiteral is exited.
+func (s *BaseExpressionListener) ExitFloatingPointLiteral(ctx *FloatingPointLiteralContext) {}
 
 // EnterExpressionArguments is called when production expressionArguments is entered.
 func (s *BaseExpressionListener) EnterExpressionArguments(ctx *ExpressionArgumentsContext) {}

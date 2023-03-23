@@ -7,19 +7,22 @@ expression
 expressionSingle
     : Identifier                                        # IdentifierAccessExpression
     | expressionConst                                   # ConstExpression
+    | '(' expressionSingle ')'                          # ParenExpression
     | expressionSingle '.' expressionSingle             # ChainExpression
     | expressionSingle '[' StringLiteral ']'            # ObjectAccessExpression
     | expressionSingle '[' IntegerLiteral ']'           # ArrayAccessExpression
     | expressionSingle '(' expressionArguments ')'      # FunctionCallExpression
+    | expressionSingle '+' expressionSingle             # PlusExpression
     | expressionSingle ('==' | '!=') expressionSingle   # EqualityExpression
     | expressionSingle '&&' expressionSingle            # LogicalAndExpression
     | expressionSingle '||' expressionSingle            # LogicalOrExpression
     ;
 
 expressionConst
-    : StringLiteral
-    | IntegerLiteral
-    | FloatingPointLiteral
+    : 'b' StringLiteral                                 # BinaryStringLiteral
+    | StringLiteral                                     # StringLiteral
+    | IntegerLiteral                                    # IntegerLiteral
+    | FloatingPointLiteral                              # FloatingPointLiteral
     ;
 
 expressionArguments
@@ -60,13 +63,13 @@ IntegerLiteral
 
 FloatingPointLiteral
 	:	DecimalFloatingPointLiteral
-	|	HexadecimalFloatingPointLiteral
 	;
 
 BooleanLiteral
 	:	'true'
 	|	'false'
 	;
+
 
 StringLiteral
 	:	'"' StringCharacters? '"'
@@ -80,8 +83,19 @@ StringCharacters
 fragment
 StringCharacter
 	:	~["'\\\r\n]
+	| EscapeSequence
 	;
 
+fragment
+EscapeSequence
+    : '\\'[btnfr"'\\]
+    | HexEscape
+    ;
+
+fragment
+HexEscape
+    :   '\\' 'x'+  HexDigit HexDigit
+    ;
 
 fragment
 DecimalIntegerLiteral

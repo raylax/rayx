@@ -13,6 +13,9 @@ type ExpressionListener interface {
 	// EnterChainExpression is called when entering the ChainExpression production.
 	EnterChainExpression(c *ChainExpressionContext)
 
+	// EnterPlusExpression is called when entering the PlusExpression production.
+	EnterPlusExpression(c *PlusExpressionContext)
+
 	// EnterLogicalAndExpression is called when entering the LogicalAndExpression production.
 	EnterLogicalAndExpression(c *LogicalAndExpressionContext)
 
@@ -21,6 +24,9 @@ type ExpressionListener interface {
 
 	// EnterLogicalOrExpression is called when entering the LogicalOrExpression production.
 	EnterLogicalOrExpression(c *LogicalOrExpressionContext)
+
+	// EnterParenExpression is called when entering the ParenExpression production.
+	EnterParenExpression(c *ParenExpressionContext)
 
 	// EnterObjectAccessExpression is called when entering the ObjectAccessExpression production.
 	EnterObjectAccessExpression(c *ObjectAccessExpressionContext)
@@ -37,8 +43,17 @@ type ExpressionListener interface {
 	// EnterIdentifierAccessExpression is called when entering the IdentifierAccessExpression production.
 	EnterIdentifierAccessExpression(c *IdentifierAccessExpressionContext)
 
-	// EnterExpressionConst is called when entering the expressionConst production.
-	EnterExpressionConst(c *ExpressionConstContext)
+	// EnterBinaryStringLiteral is called when entering the BinaryStringLiteral production.
+	EnterBinaryStringLiteral(c *BinaryStringLiteralContext)
+
+	// EnterStringLiteral is called when entering the StringLiteral production.
+	EnterStringLiteral(c *StringLiteralContext)
+
+	// EnterIntegerLiteral is called when entering the IntegerLiteral production.
+	EnterIntegerLiteral(c *IntegerLiteralContext)
+
+	// EnterFloatingPointLiteral is called when entering the FloatingPointLiteral production.
+	EnterFloatingPointLiteral(c *FloatingPointLiteralContext)
 
 	// EnterExpressionArguments is called when entering the expressionArguments production.
 	EnterExpressionArguments(c *ExpressionArgumentsContext)
@@ -52,6 +67,9 @@ type ExpressionListener interface {
 	// ExitChainExpression is called when exiting the ChainExpression production.
 	ExitChainExpression(c *ChainExpressionContext)
 
+	// ExitPlusExpression is called when exiting the PlusExpression production.
+	ExitPlusExpression(c *PlusExpressionContext)
+
 	// ExitLogicalAndExpression is called when exiting the LogicalAndExpression production.
 	ExitLogicalAndExpression(c *LogicalAndExpressionContext)
 
@@ -60,6 +78,9 @@ type ExpressionListener interface {
 
 	// ExitLogicalOrExpression is called when exiting the LogicalOrExpression production.
 	ExitLogicalOrExpression(c *LogicalOrExpressionContext)
+
+	// ExitParenExpression is called when exiting the ParenExpression production.
+	ExitParenExpression(c *ParenExpressionContext)
 
 	// ExitObjectAccessExpression is called when exiting the ObjectAccessExpression production.
 	ExitObjectAccessExpression(c *ObjectAccessExpressionContext)
@@ -76,8 +97,17 @@ type ExpressionListener interface {
 	// ExitIdentifierAccessExpression is called when exiting the IdentifierAccessExpression production.
 	ExitIdentifierAccessExpression(c *IdentifierAccessExpressionContext)
 
-	// ExitExpressionConst is called when exiting the expressionConst production.
-	ExitExpressionConst(c *ExpressionConstContext)
+	// ExitBinaryStringLiteral is called when exiting the BinaryStringLiteral production.
+	ExitBinaryStringLiteral(c *BinaryStringLiteralContext)
+
+	// ExitStringLiteral is called when exiting the StringLiteral production.
+	ExitStringLiteral(c *StringLiteralContext)
+
+	// ExitIntegerLiteral is called when exiting the IntegerLiteral production.
+	ExitIntegerLiteral(c *IntegerLiteralContext)
+
+	// ExitFloatingPointLiteral is called when exiting the FloatingPointLiteral production.
+	ExitFloatingPointLiteral(c *FloatingPointLiteralContext)
 
 	// ExitExpressionArguments is called when exiting the expressionArguments production.
 	ExitExpressionArguments(c *ExpressionArgumentsContext)
