@@ -1,15 +1,18 @@
 package expression
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
+	"regexp"
 	"strconv"
 )
 
 type Environment struct {
 	builtin map[string]EFunction
-	vars    map[string]EValue
+	vars    Vars
+	Context context.Context
 }
 
 var builtin = map[string]EFunction{
@@ -18,31 +21,34 @@ var builtin = map[string]EFunction{
 	"randomInt": &eFunctionRandomInt{},
 }
 
-func NewEnvironment() *Environment {
+var expressionStringRegex = regexp.MustCompile(`\{\{.*?\}\}`)
+
+func NewEnvironment(context context.Context, vars Vars) *Environment {
+	if vars == nil {
+		vars = MapVars{}
+	}
 	return &Environment{
 		builtin: builtin,
-		vars:    map[string]EValue{},
+		vars:    vars,
+		Context: context,
 	}
 }
 
-func (e *Environment) Set(name string, value EValue) {
-	e.vars[name] = value
-}
-
 func (e *Environment) GetString(str string) (string, error) {
+	if str == "" {
+		return "", nil
+	}
+	expressionStringRegex.ReplaceAllStringFunc(str, func(s string) string {
+		value, err := e.Eval(str[2 : len(str)-2])
+		if err != nil {
+			return str
+		}
+		if value == nil {
+			return ""
+		}
+		return string(value.ToString())
+	})
 	return str, nil
-}
-
-type TreeShapeListener struct {
-	*BaseExpressionListener
-}
-
-func NewTreeShapeListener() *TreeShapeListener {
-	return new(TreeShapeListener)
-}
-
-func (l *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
-	fmt.Println(ctx.GetText())
 }
 
 func (e *Environment) Verify(expression string) (err error) {
@@ -50,7 +56,7 @@ func (e *Environment) Verify(expression string) (err error) {
 	return
 }
 
-func (e *Environment) Eval(expression string) (any, error) {
+func (e *Environment) Eval(expression string) (EValue, error) {
 	expr, err := e.parse(expression)
 	if err != nil {
 		return nil, err
@@ -60,7 +66,19 @@ func (e *Environment) Eval(expression string) (any, error) {
 	if visitor.err != nil {
 		return nil, visitor.err
 	}
-	return val, nil
+	return val.(EValue), nil
+}
+
+func (e *Environment) EvalWithVars(expression string, vars Vars) (EValue, error) {
+	backup := e.vars
+	e.vars = combinedVars{
+		backup,
+		vars,
+	}
+	value, err := e.Eval(expression)
+	e.vars = backup
+
+	return value, err
 }
 
 func (e *Environment) parse(expression string) (IExpressionContext, error) {
@@ -94,6 +112,7 @@ func (l *parserErrorListener) SyntaxError(recognizer antlr.Recognizer, offending
 
 type EFunction interface {
 	Call(args []EValue) (EValue, error)
+	ToString() EString
 }
 
 type EValue interface {

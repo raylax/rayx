@@ -9,6 +9,10 @@ import (
 type eFunctionToString struct {
 }
 
+func (e eFunctionToString) ToString() EString {
+	return "ToString"
+}
+
 func (e eFunctionToString) Call(args []EValue) (EValue, error) {
 	if len(args) != 1 {
 		return nil, fmt.Errorf("expect one argument, got %d", len(args))
@@ -27,6 +31,10 @@ func (e eFunctionToString) Call(args []EValue) (EValue, error) {
 type eFunctionToBytes struct {
 }
 
+func (e eFunctionToBytes) ToString() EString {
+	return "ToBytes"
+}
+
 func (e eFunctionToBytes) Call(args []EValue) (EValue, error) {
 	if len(args) != 1 {
 		return nil, fmt.Errorf("expect one argument, got %d", len(args))
@@ -42,6 +50,10 @@ func (e eFunctionToBytes) Call(args []EValue) (EValue, error) {
 }
 
 type eFunctionRandomInt struct {
+}
+
+func (e eFunctionRandomInt) ToString() EString {
+	return "RandomInt"
 }
 
 func (e eFunctionRandomInt) Call(args []EValue) (EValue, error) {

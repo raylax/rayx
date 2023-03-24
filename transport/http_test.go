@@ -95,7 +95,7 @@ func TestHttpRequest(t *testing.T) {
 		},
 	}
 
-	env := expression.NewEnvironment()
+	env := expression.NewEnvironment(context.Background(), nil)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -115,7 +115,7 @@ func TestHttpRequest(t *testing.T) {
 
 func TestSetCookie(t *testing.T) {
 	const url = "https://httpbin.org"
-	env := expression.NewEnvironment()
+	env := expression.NewEnvironment(context.Background(), nil)
 	transport := NewHttpTransport(env, url, nil, nil)
 	defer transport.Close()
 
@@ -142,7 +142,7 @@ func TestSetCookie(t *testing.T) {
 
 func TestGlobalCookies(t *testing.T) {
 	const url = "https://httpbin.org"
-	env := expression.NewEnvironment()
+	env := expression.NewEnvironment(context.Background(), nil)
 	transport := NewHttpTransport(env, url, nil, map[string]string{
 		"rayx": "rayx111",
 	})
@@ -164,7 +164,7 @@ func TestGlobalCookies(t *testing.T) {
 
 func TestGlobalHeader(t *testing.T) {
 	const url = "https://httpbin.org"
-	env := expression.NewEnvironment()
+	env := expression.NewEnvironment(context.Background(), nil)
 	transport := NewHttpTransport(env, url, map[string]string{
 		"x-rayx": "rayx111",
 	}, nil)

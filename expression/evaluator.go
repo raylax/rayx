@@ -49,6 +49,10 @@ func (e *evaluator) Visit(tree antlr.ParseTree) any {
 		return e.visitFloatingPointLiteralContext(tree.(*FloatingPointLiteralContext))
 	case *BooleanLiteralContext:
 		return e.visitBooleanLiteralContext(tree.(*BooleanLiteralContext))
+	case *EqualityExpressionContext:
+		return e.visitEqualityExpressionContext(tree.(*EqualityExpressionContext))
+	case *ChainExpressionContext:
+		return e.visitChainExpressionContext(tree.(*ChainExpressionContext))
 	}
 	panic(reflect.TypeOf(tree))
 }
@@ -59,13 +63,14 @@ func (e *evaluator) visitIdentifierAccessExpressionContext(c *IdentifierAccessEx
 
 func (e *evaluator) visitIdentifier(n antlr.TerminalNode) any {
 	variable := n.GetText()
-	if value, ok := e.env.vars[variable]; ok {
-		return value
-	}
 	if value, ok := e.env.builtin[variable]; ok {
 		return value
 	}
-	return fmt.Errorf("'%s' not defined", variable)
+	value, err := e.env.vars.GetValue(e.env, variable)
+	if err != nil {
+		return e.Error(err)
+	}
+	return value
 }
 
 func (e *evaluator) visitFunctionCallExpressionContext(c *FunctionCallExpressionContext) any {
@@ -75,21 +80,28 @@ func (e *evaluator) visitFunctionCallExpressionContext(c *FunctionCallExpression
 		return e.Error(fmt.Errorf("%s is not function", c.ExpressionSingle().GetText()))
 	}
 
-	args := lo.Map(c.ExpressionArguments().AllExpressionArgument(), func(item IExpressionArgumentContext, index int) EValue {
-		if v := item.StringLiteral(); v != nil {
-			return e.visitStringLiteral(v).(EValue)
-		}
-		if v := item.IntegerLiteral(); v != nil {
-			return e.visitIntegerLiteral(v).(EValue)
-		}
-		if v := item.Identifier(); v != nil {
-			return e.visitIdentifier(v).(EValue)
-		}
-		if v := item.ExpressionSingle(); v != nil {
-			return e.Visit(v).(EValue)
-		}
-		panic("unreached code")
-	})
+	expressionArguments := c.ExpressionArguments()
+
+	var args []EValue
+	if expressionArguments.GetChildCount() == 1 && expressionArguments.ExpressionArgument(0).GetText() == "" {
+		args = make([]EValue, 0, 0)
+	} else {
+		args = lo.Map(expressionArguments.AllExpressionArgument(), func(item IExpressionArgumentContext, index int) EValue {
+			if v := item.StringLiteral(); v != nil {
+				return e.visitStringLiteral(v).(EValue)
+			}
+			if v := item.IntegerLiteral(); v != nil {
+				return e.visitIntegerLiteral(v).(EValue)
+			}
+			if v := item.Identifier(); v != nil {
+				return e.visitIdentifier(v).(EValue)
+			}
+			if v := item.ExpressionSingle(); v != nil {
+				return e.Visit(v).(EValue)
+			}
+			panic("unreached code")
+		})
+	}
 
 	if e.err != nil {
 		return nil
@@ -176,6 +188,16 @@ func (e *evaluator) visitPlusExpression(c *PlusExpressionContext) any {
 	panic("unreached code")
 }
 
+func (e *evaluator) visitEqualityExpressionContext(c *EqualityExpressionContext) any {
+	left := e.Visit(c.ExpressionSingle(0))
+	right := e.Visit(c.ExpressionSingle(1))
+	return EBool(reflect.DeepEqual(left, right))
+}
+
+func (e *evaluator) visitChainExpressionContext(c *ChainExpressionContext) any {
+	return nil
+}
+
 func (e *evaluator) Error(err error) any {
 	if e.err == nil {
 		e.err = err
@@ -188,11 +210,9 @@ func (e *evaluator) VisitChildren(node antlr.RuleNode) any {
 }
 
 func (e *evaluator) VisitTerminal(node antlr.TerminalNode) any {
-	//TODO implement me
 	panic("implement me")
 }
 
 func (e *evaluator) VisitErrorNode(node antlr.ErrorNode) any {
-	//TODO implement me
 	panic("implement me")
 }

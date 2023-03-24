@@ -1,6 +1,7 @@
 package expression
 
 import (
+	"context"
 	"github.com/raylax/rayx/dsl"
 	"os"
 	"path/filepath"
@@ -16,7 +17,7 @@ func TestEnvironment_Verify(t *testing.T) {
 	}
 	for _, f := range entries {
 		t.Run(f.Name(), func(t *testing.T) {
-			env := NewEnvironment()
+			env := NewEnvironment(context.Background(), nil)
 			poc, err := dsl.ParsePoc(filepath.Join(testdataPath, f.Name()))
 			if err != nil {
 				t.Error(err)

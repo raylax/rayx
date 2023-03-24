@@ -8,7 +8,7 @@ expressionSingle
     : expressionConst                                   # ConstExpression
     | Identifier                                        # IdentifierAccessExpression
     | '(' expressionSingle ')'                          # ParenExpression
-    | expressionSingle '.' expressionSingle             # ChainExpression
+    | expressionSingle ('.' Identifier) +                # ChainExpression
     | expressionSingle '[' StringLiteral ']'            # ObjectAccessExpression
     | expressionSingle '[' IntegerLiteral ']'           # ArrayAccessExpression
     | expressionSingle '(' expressionArguments ')'      # FunctionCallExpression
@@ -17,6 +17,7 @@ expressionSingle
     | expressionSingle '&&' expressionSingle            # LogicalAndExpression
     | expressionSingle '||' expressionSingle            # LogicalOrExpression
     ;
+
 
 expressionConst
     : BooleanLiteral                                    # BooleanLiteral

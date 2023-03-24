@@ -27,6 +27,10 @@ type HttpResponse struct {
 	raw *http.Response
 }
 
+func (h HttpResponse) ToString() expression.EString {
+	return "<http-response>"
+}
+
 type HttpTransport struct {
 	env     *expression.Environment
 	client  *http.Client

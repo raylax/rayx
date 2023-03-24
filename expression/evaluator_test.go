@@ -1,6 +1,8 @@
 package expression
 
 import (
+	"context"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -110,8 +112,9 @@ func Test_evaluator_Visit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.expression, func(t *testing.T) {
-			env := NewEnvironment()
-			env.Set("bbb", EString("bv"))
+			env := NewEnvironment(context.Background(), vars{
+				"bbb": EString("bv"),
+			})
 			val, err := env.Eval(tt.expression)
 			if tt.err && err != nil {
 				return
@@ -124,4 +127,13 @@ func Test_evaluator_Visit(t *testing.T) {
 			}
 		})
 	}
+}
+
+type vars map[string]EValue
+
+func (v vars) GetValue(env *Environment, key string) (EValue, error) {
+	if value, ok := v[key]; ok {
+		return value, nil
+	}
+	return nil, fmt.Errorf("'%s' undefined", key)
 }
