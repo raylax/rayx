@@ -5,8 +5,8 @@ expression
     ;
 
 expressionSingle
-    : Identifier                                        # IdentifierAccessExpression
-    | expressionConst                                   # ConstExpression
+    : expressionConst                                   # ConstExpression
+    | Identifier                                        # IdentifierAccessExpression
     | '(' expressionSingle ')'                          # ParenExpression
     | expressionSingle '.' expressionSingle             # ChainExpression
     | expressionSingle '[' StringLiteral ']'            # ObjectAccessExpression
@@ -19,7 +19,8 @@ expressionSingle
     ;
 
 expressionConst
-    : 'b' StringLiteral                                 # BinaryStringLiteral
+    : BooleanLiteral                                    # BooleanLiteral
+    | 'b' StringLiteral                                 # BinaryStringLiteral
     | StringLiteral                                     # StringLiteral
     | IntegerLiteral                                    # IntegerLiteral
     | FloatingPointLiteral                              # FloatingPointLiteral
@@ -49,6 +50,12 @@ NOTEQUAL : '!=';
 
 WhiteSpaces : [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN);
 
+
+BooleanLiteral
+	:	'true'
+	|	'false'
+	;
+
 Identifier
 	: [a-zA-Z$_]+[a-zA-Z0-9$_]*
 	;
@@ -63,11 +70,6 @@ IntegerLiteral
 
 FloatingPointLiteral
 	:	DecimalFloatingPointLiteral
-	;
-
-BooleanLiteral
-	:	'true'
-	|	'false'
 	;
 
 

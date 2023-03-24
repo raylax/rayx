@@ -37,8 +37,8 @@ func expressionParserInit() {
 	}
 	staticData.symbolicNames = []string{
 		"", "", "", "", "", "", "DOT", "LBRACK", "RBRACK", "LPAREN", "RPAREN",
-		"EQUAL", "NOTEQUAL", "WhiteSpaces", "Identifier", "IntegerLiteral",
-		"FloatingPointLiteral", "BooleanLiteral", "StringLiteral",
+		"EQUAL", "NOTEQUAL", "BooleanLiteral", "WhiteSpaces", "Identifier",
+		"IntegerLiteral", "FloatingPointLiteral", "StringLiteral",
 	}
 	staticData.ruleNames = []string{
 		"expression", "expressionSingle", "expressionConst", "expressionArguments",
@@ -46,18 +46,18 @@ func expressionParserInit() {
 	}
 	staticData.predictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 18, 78, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+		4, 1, 18, 79, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
 		4, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 21,
 		8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 51, 8, 1, 10, 1, 12, 1, 54, 9, 1, 1,
-		2, 1, 2, 1, 2, 1, 2, 1, 2, 3, 2, 61, 8, 2, 1, 3, 1, 3, 1, 3, 5, 3, 66,
-		8, 3, 10, 3, 12, 3, 69, 9, 3, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 3, 4, 76, 8,
-		4, 1, 4, 0, 1, 2, 5, 0, 2, 4, 6, 8, 0, 1, 1, 0, 11, 12, 90, 0, 10, 1, 0,
-		0, 0, 2, 20, 1, 0, 0, 0, 4, 60, 1, 0, 0, 0, 6, 62, 1, 0, 0, 0, 8, 75, 1,
-		0, 0, 0, 10, 11, 3, 2, 1, 0, 11, 12, 5, 0, 0, 1, 12, 1, 1, 0, 0, 0, 13,
-		14, 6, 1, -1, 0, 14, 21, 5, 14, 0, 0, 15, 21, 3, 4, 2, 0, 16, 17, 5, 9,
-		0, 0, 17, 18, 3, 2, 1, 0, 18, 19, 5, 10, 0, 0, 19, 21, 1, 0, 0, 0, 20,
+		2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 3, 2, 62, 8, 2, 1, 3, 1, 3, 1, 3, 5, 3,
+		67, 8, 3, 10, 3, 12, 3, 70, 9, 3, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 3, 4, 77,
+		8, 4, 1, 4, 0, 1, 2, 5, 0, 2, 4, 6, 8, 0, 1, 1, 0, 11, 12, 92, 0, 10, 1,
+		0, 0, 0, 2, 20, 1, 0, 0, 0, 4, 61, 1, 0, 0, 0, 6, 63, 1, 0, 0, 0, 8, 76,
+		1, 0, 0, 0, 10, 11, 3, 2, 1, 0, 11, 12, 5, 0, 0, 1, 12, 1, 1, 0, 0, 0,
+		13, 14, 6, 1, -1, 0, 14, 21, 3, 4, 2, 0, 15, 21, 5, 15, 0, 0, 16, 17, 5,
+		9, 0, 0, 17, 18, 3, 2, 1, 0, 18, 19, 5, 10, 0, 0, 19, 21, 1, 0, 0, 0, 20,
 		13, 1, 0, 0, 0, 20, 15, 1, 0, 0, 0, 20, 16, 1, 0, 0, 0, 21, 52, 1, 0, 0,
 		0, 22, 23, 10, 8, 0, 0, 23, 24, 5, 6, 0, 0, 24, 51, 3, 2, 1, 9, 25, 26,
 		10, 4, 0, 0, 26, 27, 5, 1, 0, 0, 27, 51, 3, 2, 1, 5, 28, 29, 10, 3, 0,
@@ -65,21 +65,21 @@ func expressionParserInit() {
 		5, 2, 0, 0, 33, 51, 3, 2, 1, 3, 34, 35, 10, 1, 0, 0, 35, 36, 5, 3, 0, 0,
 		36, 51, 3, 2, 1, 2, 37, 38, 10, 7, 0, 0, 38, 39, 5, 7, 0, 0, 39, 40, 5,
 		18, 0, 0, 40, 51, 5, 8, 0, 0, 41, 42, 10, 6, 0, 0, 42, 43, 5, 7, 0, 0,
-		43, 44, 5, 15, 0, 0, 44, 51, 5, 8, 0, 0, 45, 46, 10, 5, 0, 0, 46, 47, 5,
+		43, 44, 5, 16, 0, 0, 44, 51, 5, 8, 0, 0, 45, 46, 10, 5, 0, 0, 46, 47, 5,
 		9, 0, 0, 47, 48, 3, 6, 3, 0, 48, 49, 5, 10, 0, 0, 49, 51, 1, 0, 0, 0, 50,
 		22, 1, 0, 0, 0, 50, 25, 1, 0, 0, 0, 50, 28, 1, 0, 0, 0, 50, 31, 1, 0, 0,
 		0, 50, 34, 1, 0, 0, 0, 50, 37, 1, 0, 0, 0, 50, 41, 1, 0, 0, 0, 50, 45,
 		1, 0, 0, 0, 51, 54, 1, 0, 0, 0, 52, 50, 1, 0, 0, 0, 52, 53, 1, 0, 0, 0,
-		53, 3, 1, 0, 0, 0, 54, 52, 1, 0, 0, 0, 55, 56, 5, 4, 0, 0, 56, 61, 5, 18,
-		0, 0, 57, 61, 5, 18, 0, 0, 58, 61, 5, 15, 0, 0, 59, 61, 5, 16, 0, 0, 60,
-		55, 1, 0, 0, 0, 60, 57, 1, 0, 0, 0, 60, 58, 1, 0, 0, 0, 60, 59, 1, 0, 0,
-		0, 61, 5, 1, 0, 0, 0, 62, 67, 3, 8, 4, 0, 63, 64, 5, 5, 0, 0, 64, 66, 3,
-		8, 4, 0, 65, 63, 1, 0, 0, 0, 66, 69, 1, 0, 0, 0, 67, 65, 1, 0, 0, 0, 67,
-		68, 1, 0, 0, 0, 68, 7, 1, 0, 0, 0, 69, 67, 1, 0, 0, 0, 70, 76, 1, 0, 0,
-		0, 71, 76, 5, 14, 0, 0, 72, 76, 5, 15, 0, 0, 73, 76, 5, 18, 0, 0, 74, 76,
-		3, 2, 1, 0, 75, 70, 1, 0, 0, 0, 75, 71, 1, 0, 0, 0, 75, 72, 1, 0, 0, 0,
-		75, 73, 1, 0, 0, 0, 75, 74, 1, 0, 0, 0, 76, 9, 1, 0, 0, 0, 6, 20, 50, 52,
-		60, 67, 75,
+		53, 3, 1, 0, 0, 0, 54, 52, 1, 0, 0, 0, 55, 62, 5, 13, 0, 0, 56, 57, 5,
+		4, 0, 0, 57, 62, 5, 18, 0, 0, 58, 62, 5, 18, 0, 0, 59, 62, 5, 16, 0, 0,
+		60, 62, 5, 17, 0, 0, 61, 55, 1, 0, 0, 0, 61, 56, 1, 0, 0, 0, 61, 58, 1,
+		0, 0, 0, 61, 59, 1, 0, 0, 0, 61, 60, 1, 0, 0, 0, 62, 5, 1, 0, 0, 0, 63,
+		68, 3, 8, 4, 0, 64, 65, 5, 5, 0, 0, 65, 67, 3, 8, 4, 0, 66, 64, 1, 0, 0,
+		0, 67, 70, 1, 0, 0, 0, 68, 66, 1, 0, 0, 0, 68, 69, 1, 0, 0, 0, 69, 7, 1,
+		0, 0, 0, 70, 68, 1, 0, 0, 0, 71, 77, 1, 0, 0, 0, 72, 77, 5, 15, 0, 0, 73,
+		77, 5, 16, 0, 0, 74, 77, 5, 18, 0, 0, 75, 77, 3, 2, 1, 0, 76, 71, 1, 0,
+		0, 0, 76, 72, 1, 0, 0, 0, 76, 73, 1, 0, 0, 0, 76, 74, 1, 0, 0, 0, 76, 75,
+		1, 0, 0, 0, 77, 9, 1, 0, 0, 0, 6, 20, 50, 52, 61, 68, 76,
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
 	staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -130,11 +130,11 @@ const (
 	ExpressionParserRPAREN               = 10
 	ExpressionParserEQUAL                = 11
 	ExpressionParserNOTEQUAL             = 12
-	ExpressionParserWhiteSpaces          = 13
-	ExpressionParserIdentifier           = 14
-	ExpressionParserIntegerLiteral       = 15
-	ExpressionParserFloatingPointLiteral = 16
-	ExpressionParserBooleanLiteral       = 17
+	ExpressionParserBooleanLiteral       = 13
+	ExpressionParserWhiteSpaces          = 14
+	ExpressionParserIdentifier           = 15
+	ExpressionParserIntegerLiteral       = 16
+	ExpressionParserFloatingPointLiteral = 17
 	ExpressionParserStringLiteral        = 18
 )
 
@@ -1041,23 +1041,23 @@ func (p *ExpressionParser) expressionSingle(_p int) (localctx IExpressionSingleC
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case ExpressionParserIdentifier:
-		localctx = NewIdentifierAccessExpressionContext(p, localctx)
+	case ExpressionParserT__3, ExpressionParserBooleanLiteral, ExpressionParserIntegerLiteral, ExpressionParserFloatingPointLiteral, ExpressionParserStringLiteral:
+		localctx = NewConstExpressionContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 
 		{
 			p.SetState(14)
-			p.Match(ExpressionParserIdentifier)
+			p.ExpressionConst()
 		}
 
-	case ExpressionParserT__3, ExpressionParserIntegerLiteral, ExpressionParserFloatingPointLiteral, ExpressionParserStringLiteral:
-		localctx = NewConstExpressionContext(p, localctx)
+	case ExpressionParserIdentifier:
+		localctx = NewIdentifierAccessExpressionContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
 			p.SetState(15)
-			p.ExpressionConst()
+			p.Match(ExpressionParserIdentifier)
 		}
 
 	case ExpressionParserLPAREN:
@@ -1411,6 +1411,40 @@ func (s *FloatingPointLiteralContext) ExitRule(listener antlr.ParseTreeListener)
 	}
 }
 
+type BooleanLiteralContext struct {
+	*ExpressionConstContext
+}
+
+func NewBooleanLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *BooleanLiteralContext {
+	var p = new(BooleanLiteralContext)
+
+	p.ExpressionConstContext = NewEmptyExpressionConstContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*ExpressionConstContext))
+
+	return p
+}
+
+func (s *BooleanLiteralContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *BooleanLiteralContext) BooleanLiteral() antlr.TerminalNode {
+	return s.GetToken(ExpressionParserBooleanLiteral, 0)
+}
+
+func (s *BooleanLiteralContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(ExpressionListener); ok {
+		listenerT.EnterBooleanLiteral(s)
+	}
+}
+
+func (s *BooleanLiteralContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(ExpressionListener); ok {
+		listenerT.ExitBooleanLiteral(s)
+	}
+}
+
 type IntegerLiteralContext struct {
 	*ExpressionConstContext
 }
@@ -1468,43 +1502,51 @@ func (p *ExpressionParser) ExpressionConst() (localctx IExpressionConstContext) 
 		}
 	}()
 
-	p.SetState(60)
+	p.SetState(61)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case ExpressionParserT__3:
-		localctx = NewBinaryStringLiteralContext(p, localctx)
+	case ExpressionParserBooleanLiteral:
+		localctx = NewBooleanLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
 			p.SetState(55)
-			p.Match(ExpressionParserT__3)
-		}
-		{
-			p.SetState(56)
-			p.Match(ExpressionParserStringLiteral)
+			p.Match(ExpressionParserBooleanLiteral)
 		}
 
-	case ExpressionParserStringLiteral:
-		localctx = NewStringLiteralContext(p, localctx)
+	case ExpressionParserT__3:
+		localctx = NewBinaryStringLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
+		{
+			p.SetState(56)
+			p.Match(ExpressionParserT__3)
+		}
 		{
 			p.SetState(57)
 			p.Match(ExpressionParserStringLiteral)
 		}
 
-	case ExpressionParserIntegerLiteral:
-		localctx = NewIntegerLiteralContext(p, localctx)
+	case ExpressionParserStringLiteral:
+		localctx = NewStringLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 3)
 		{
 			p.SetState(58)
+			p.Match(ExpressionParserStringLiteral)
+		}
+
+	case ExpressionParserIntegerLiteral:
+		localctx = NewIntegerLiteralContext(p, localctx)
+		p.EnterOuterAlt(localctx, 4)
+		{
+			p.SetState(59)
 			p.Match(ExpressionParserIntegerLiteral)
 		}
 
 	case ExpressionParserFloatingPointLiteral:
 		localctx = NewFloatingPointLiteralContext(p, localctx)
-		p.EnterOuterAlt(localctx, 4)
+		p.EnterOuterAlt(localctx, 5)
 		{
-			p.SetState(59)
+			p.SetState(60)
 			p.Match(ExpressionParserFloatingPointLiteral)
 		}
 
@@ -1644,24 +1686,24 @@ func (p *ExpressionParser) ExpressionArguments() (localctx IExpressionArgumentsC
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(62)
+		p.SetState(63)
 		p.ExpressionArgument()
 	}
-	p.SetState(67)
+	p.SetState(68)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	for _la == ExpressionParserT__4 {
 		{
-			p.SetState(63)
+			p.SetState(64)
 			p.Match(ExpressionParserT__4)
 		}
 		{
-			p.SetState(64)
+			p.SetState(65)
 			p.ExpressionArgument()
 		}
 
-		p.SetState(69)
+		p.SetState(70)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
@@ -1784,7 +1826,7 @@ func (p *ExpressionParser) ExpressionArgument() (localctx IExpressionArgumentCon
 		}
 	}()
 
-	p.SetState(75)
+	p.SetState(76)
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 5, p.GetParserRuleContext()) {
 	case 1:
@@ -1793,28 +1835,28 @@ func (p *ExpressionParser) ExpressionArgument() (localctx IExpressionArgumentCon
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(71)
+			p.SetState(72)
 			p.Match(ExpressionParserIdentifier)
 		}
 
 	case 3:
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(72)
+			p.SetState(73)
 			p.Match(ExpressionParserIntegerLiteral)
 		}
 
 	case 4:
 		p.EnterOuterAlt(localctx, 4)
 		{
-			p.SetState(73)
+			p.SetState(74)
 			p.Match(ExpressionParserStringLiteral)
 		}
 
 	case 5:
 		p.EnterOuterAlt(localctx, 5)
 		{
-			p.SetState(74)
+			p.SetState(75)
 			p.expressionSingle(0)
 		}
 

@@ -43,6 +43,9 @@ type ExpressionListener interface {
 	// EnterIdentifierAccessExpression is called when entering the IdentifierAccessExpression production.
 	EnterIdentifierAccessExpression(c *IdentifierAccessExpressionContext)
 
+	// EnterBooleanLiteral is called when entering the BooleanLiteral production.
+	EnterBooleanLiteral(c *BooleanLiteralContext)
+
 	// EnterBinaryStringLiteral is called when entering the BinaryStringLiteral production.
 	EnterBinaryStringLiteral(c *BinaryStringLiteralContext)
 
@@ -96,6 +99,9 @@ type ExpressionListener interface {
 
 	// ExitIdentifierAccessExpression is called when exiting the IdentifierAccessExpression production.
 	ExitIdentifierAccessExpression(c *IdentifierAccessExpressionContext)
+
+	// ExitBooleanLiteral is called when exiting the BooleanLiteral production.
+	ExitBooleanLiteral(c *BooleanLiteralContext)
 
 	// ExitBinaryStringLiteral is called when exiting the BinaryStringLiteral production.
 	ExitBinaryStringLiteral(c *BinaryStringLiteralContext)

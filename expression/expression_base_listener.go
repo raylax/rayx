@@ -94,6 +94,12 @@ func (s *BaseExpressionListener) EnterIdentifierAccessExpression(ctx *Identifier
 func (s *BaseExpressionListener) ExitIdentifierAccessExpression(ctx *IdentifierAccessExpressionContext) {
 }
 
+// EnterBooleanLiteral is called when production BooleanLiteral is entered.
+func (s *BaseExpressionListener) EnterBooleanLiteral(ctx *BooleanLiteralContext) {}
+
+// ExitBooleanLiteral is called when production BooleanLiteral is exited.
+func (s *BaseExpressionListener) ExitBooleanLiteral(ctx *BooleanLiteralContext) {}
+
 // EnterBinaryStringLiteral is called when production BinaryStringLiteral is entered.
 func (s *BaseExpressionListener) EnterBinaryStringLiteral(ctx *BinaryStringLiteralContext) {}
 
