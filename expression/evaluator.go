@@ -7,6 +7,7 @@ import (
 	"github.com/samber/lo"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 type evaluator struct {
@@ -51,8 +52,14 @@ func (e *evaluator) Visit(tree antlr.ParseTree) any {
 		return e.visitBooleanLiteralContext(tree.(*BooleanLiteralContext))
 	case *EqualityExpressionContext:
 		return e.visitEqualityExpressionContext(tree.(*EqualityExpressionContext))
-	case *ChainExpressionContext:
-		return e.visitChainExpressionContext(tree.(*ChainExpressionContext))
+	case *MemberAccessExpressionContext:
+		return e.visitMemberAccessExpressionContext(tree.(*MemberAccessExpressionContext))
+	case *LogicalAndExpressionContext:
+		return e.visitLogicalAndExpressionContext(tree.(*LogicalAndExpressionContext))
+	case *LogicalOrExpressionContext:
+		return e.visitLogicalOrExpressionContext(tree.(*LogicalOrExpressionContext))
+	case *ParenExpressionContext:
+		return e.visitParenExpressionContext(tree.(*ParenExpressionContext))
 	}
 	panic(reflect.TypeOf(tree))
 }
@@ -151,7 +158,12 @@ func (e *evaluator) visitStringLiteralContext(c *StringLiteralContext) any {
 
 func (e *evaluator) visitStringLiteral(n antlr.TerminalNode) any {
 	text := n.GetText()
-	text, err := strconv.Unquote(`"` + text[1:len(text)-1] + `"`)
+	var err error
+	if text[0] == byte('\'') {
+		text, err = strconv.Unquote(`"` + strings.ReplaceAll(text[1:len(text)-1], `"`, `\"`) + `"`)
+	} else {
+		text, err = strconv.Unquote(text)
+	}
 	if err != nil {
 		return e.Error(err)
 	}
@@ -194,8 +206,58 @@ func (e *evaluator) visitEqualityExpressionContext(c *EqualityExpressionContext)
 	return EBool(reflect.DeepEqual(left, right))
 }
 
-func (e *evaluator) visitChainExpressionContext(c *ChainExpressionContext) any {
-	return nil
+func (e *evaluator) visitLogicalAndExpressionContext(c *LogicalAndExpressionContext) any {
+	left, ok := e.Visit(c.ExpressionSingle(0)).(EBool)
+	if !ok {
+		return e.Error(fmt.Errorf("expect TBool, got %s", reflect.TypeOf(left)))
+	}
+	right, ok := e.Visit(c.ExpressionSingle(1)).(EBool)
+	if !ok {
+		return e.Error(fmt.Errorf("expect TBool, got %s", reflect.TypeOf(right)))
+	}
+	return left && right
+}
+
+func (e *evaluator) visitLogicalOrExpressionContext(c *LogicalOrExpressionContext) any {
+	left, ok := e.Visit(c.ExpressionSingle(0)).(EBool)
+	if !ok {
+		return e.Error(fmt.Errorf("expect TBool, got %s", reflect.TypeOf(left)))
+	}
+	right, ok := e.Visit(c.ExpressionSingle(1)).(EBool)
+	if !ok {
+		return e.Error(fmt.Errorf("expect TBool, got %s", reflect.TypeOf(right)))
+	}
+	return left || right
+}
+
+func (e *evaluator) visitMemberAccessExpressionContext(c *MemberAccessExpressionContext) any {
+	left := e.Visit(c.ExpressionSingle())
+	if e.err != nil {
+		return nil
+	}
+
+	object, ok := left.(EObject)
+	if !ok {
+		return e.Error(fmt.Errorf("expect EObject, got %s", reflect.TypeOf(left)))
+	}
+
+	expressionMember := c.ExpressionMember()
+	var member string
+	if s := expressionMember.StringLiteral(); s != nil {
+		text := s.GetText()
+		member = text[1 : len(text)-1]
+	} else {
+		member = expressionMember.GetText()[1:]
+	}
+	value, err := object.Get(member)
+	if err != nil {
+		return e.Error(err)
+	}
+	return value
+}
+
+func (e *evaluator) visitParenExpressionContext(c *ParenExpressionContext) any {
+	return e.Visit(c.ExpressionSingle())
 }
 
 func (e *evaluator) Error(err error) any {

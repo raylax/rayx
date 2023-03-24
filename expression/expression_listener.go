@@ -10,8 +10,8 @@ type ExpressionListener interface {
 	// EnterExpression is called when entering the expression production.
 	EnterExpression(c *ExpressionContext)
 
-	// EnterChainExpression is called when entering the ChainExpression production.
-	EnterChainExpression(c *ChainExpressionContext)
+	// EnterMemberAccessExpression is called when entering the MemberAccessExpression production.
+	EnterMemberAccessExpression(c *MemberAccessExpressionContext)
 
 	// EnterPlusExpression is called when entering the PlusExpression production.
 	EnterPlusExpression(c *PlusExpressionContext)
@@ -28,9 +28,6 @@ type ExpressionListener interface {
 	// EnterParenExpression is called when entering the ParenExpression production.
 	EnterParenExpression(c *ParenExpressionContext)
 
-	// EnterObjectAccessExpression is called when entering the ObjectAccessExpression production.
-	EnterObjectAccessExpression(c *ObjectAccessExpressionContext)
-
 	// EnterEqualityExpression is called when entering the EqualityExpression production.
 	EnterEqualityExpression(c *EqualityExpressionContext)
 
@@ -42,6 +39,9 @@ type ExpressionListener interface {
 
 	// EnterIdentifierAccessExpression is called when entering the IdentifierAccessExpression production.
 	EnterIdentifierAccessExpression(c *IdentifierAccessExpressionContext)
+
+	// EnterExpressionMember is called when entering the expressionMember production.
+	EnterExpressionMember(c *ExpressionMemberContext)
 
 	// EnterBooleanLiteral is called when entering the BooleanLiteral production.
 	EnterBooleanLiteral(c *BooleanLiteralContext)
@@ -67,8 +67,8 @@ type ExpressionListener interface {
 	// ExitExpression is called when exiting the expression production.
 	ExitExpression(c *ExpressionContext)
 
-	// ExitChainExpression is called when exiting the ChainExpression production.
-	ExitChainExpression(c *ChainExpressionContext)
+	// ExitMemberAccessExpression is called when exiting the MemberAccessExpression production.
+	ExitMemberAccessExpression(c *MemberAccessExpressionContext)
 
 	// ExitPlusExpression is called when exiting the PlusExpression production.
 	ExitPlusExpression(c *PlusExpressionContext)
@@ -85,9 +85,6 @@ type ExpressionListener interface {
 	// ExitParenExpression is called when exiting the ParenExpression production.
 	ExitParenExpression(c *ParenExpressionContext)
 
-	// ExitObjectAccessExpression is called when exiting the ObjectAccessExpression production.
-	ExitObjectAccessExpression(c *ObjectAccessExpressionContext)
-
 	// ExitEqualityExpression is called when exiting the EqualityExpression production.
 	ExitEqualityExpression(c *EqualityExpressionContext)
 
@@ -99,6 +96,9 @@ type ExpressionListener interface {
 
 	// ExitIdentifierAccessExpression is called when exiting the IdentifierAccessExpression production.
 	ExitIdentifierAccessExpression(c *IdentifierAccessExpressionContext)
+
+	// ExitExpressionMember is called when exiting the expressionMember production.
+	ExitExpressionMember(c *ExpressionMemberContext)
 
 	// ExitBooleanLiteral is called when exiting the BooleanLiteral production.
 	ExitBooleanLiteral(c *BooleanLiteralContext)

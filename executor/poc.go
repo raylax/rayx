@@ -26,8 +26,11 @@ func (e *PocExecutor) Execute(config *cmd.Config, dsl dsl.Poc) (State, error) {
 		return StateError, errors.New("unsupported transport " + dsl.Transport)
 	}
 
+	ctx := context.Background()
+
 	set := NewSet(*dsl.Set)
-	env := expression.NewEnvironment(context.Background(), set)
+
+	env := expression.NewEnvironment(ctx, set)
 	t := transport.NewHttpTransport(env, config.Url, config.Headers, config.Cookies)
 
 	var rules = Rules{}
@@ -47,6 +50,7 @@ func (e *PocExecutor) Execute(config *cmd.Config, dsl dsl.Poc) (State, error) {
 		}
 	}
 
+	env = expression.NewEnvironment(ctx, set)
 	value, err := env.EvalWithVars(dsl.Expression, rules)
 	if err != nil {
 		return StateError, err

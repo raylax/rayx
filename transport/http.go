@@ -3,6 +3,7 @@ package transport
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"github.com/raylax/rayx/dsl"
 	"github.com/raylax/rayx/expression"
 	"github.com/samber/lo"
@@ -24,7 +25,30 @@ var httpMethods = []string{
 }
 
 type HttpResponse struct {
-	raw *http.Response
+	raw  *http.Response
+	err  error
+	data expression.EBytes
+}
+
+func (h HttpResponse) Get(name string) (expression.EValue, error) {
+	switch name {
+	case "status":
+		return expression.EInt(h.raw.StatusCode), nil
+	case "body":
+		if h.err != nil {
+			return nil, h.err
+		}
+		if h.data == nil {
+			bytes, err := io.ReadAll(h.raw.Body)
+			if err != nil {
+				h.err = err
+				return nil, err
+			}
+			h.data = bytes
+		}
+		return h.data, nil
+	}
+	return nil, fmt.Errorf("'%s' undefined", name)
 }
 
 func (h HttpResponse) ToString() expression.EString {

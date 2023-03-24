@@ -14,6 +14,34 @@ func Test_evaluator_Visit(t *testing.T) {
 		err        bool
 	}{
 		{
+			expression: "true && false",
+			want:       EBool(false),
+		},
+		{
+			expression: "true && true",
+			want:       EBool(true),
+		},
+		{
+			expression: "false && false",
+			want:       EBool(false),
+		},
+		{
+			expression: "true || true",
+			want:       EBool(true),
+		},
+		{
+			expression: "true || false",
+			want:       EBool(true),
+		},
+		{
+			expression: "false || true",
+			want:       EBool(true),
+		},
+		{
+			expression: "false || false",
+			want:       EBool(false),
+		},
+		{
 			expression: "1 + 2",
 			want:       EInt(3),
 		},

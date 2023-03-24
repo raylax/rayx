@@ -8,8 +8,7 @@ expressionSingle
     : expressionConst                                   # ConstExpression
     | Identifier                                        # IdentifierAccessExpression
     | '(' expressionSingle ')'                          # ParenExpression
-    | expressionSingle ('.' Identifier) +                # ChainExpression
-    | expressionSingle '[' StringLiteral ']'            # ObjectAccessExpression
+    | expressionSingle expressionMember                 # MemberAccessExpression
     | expressionSingle '[' IntegerLiteral ']'           # ArrayAccessExpression
     | expressionSingle '(' expressionArguments ')'      # FunctionCallExpression
     | expressionSingle '+' expressionSingle             # PlusExpression
@@ -18,6 +17,10 @@ expressionSingle
     | expressionSingle '||' expressionSingle            # LogicalOrExpression
     ;
 
+expressionMember
+    : '.' 'b'? Identifier?
+    | '[' StringLiteral ']'
+    ;
 
 expressionConst
     : BooleanLiteral                                    # BooleanLiteral
@@ -75,24 +78,60 @@ FloatingPointLiteral
 
 
 StringLiteral
-	:	'"' StringCharacters? '"'
-	|   '\'' StringCharacters? '\''
+	:	'"' DoubleStringCharacter* '"'
+	|   '\'' SingleStringCharacter* '\''
 	;
 
 fragment
-StringCharacters
-	:	StringCharacter+
-	;
+DoubleStringCharacter
+    : ~["\\\r\n]
+    | '\\' EscapeSequence
+    ;
+
 fragment
-StringCharacter
-	:	~["'\\\r\n]
-	| EscapeSequence
-	;
+SingleStringCharacter
+    : ~['\\\r\n]
+    | '\\' EscapeSequence
+    ;
 
 fragment
 EscapeSequence
-    : '\\'[abtnfr"'\\]
-    | HexEscape
+    : CharacterEscapeSequence
+    | HexEscapeSequence
+    | UnicodeEscapeSequence
+    | ExtendedUnicodeEscapeSequence
+    ;
+
+fragment
+CharacterEscapeSequence
+    : SingleEscapeCharacter
+    | NonEscapeCharacter
+    ;
+
+fragment
+HexEscapeSequence
+    : 'x' HexDigit HexDigit
+    ;
+
+fragment
+UnicodeEscapeSequence
+    : 'u' HexDigit HexDigit HexDigit HexDigit
+    | 'u' '{' HexDigit HexDigit+ '}'
+    ;
+
+fragment
+ExtendedUnicodeEscapeSequence
+    : 'u' '{' HexDigit+ '}'
+    ;
+
+fragment
+SingleEscapeCharacter
+    : ['"\\bfnrtv]
+    ;
+
+fragment
+NonEscapeCharacter
+    : ~['"\\bfnrtv0-9xu\r\n]
     ;
 
 fragment

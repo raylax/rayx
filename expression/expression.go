@@ -1,10 +1,12 @@
 package expression
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
+	"reflect"
 	"regexp"
 	"strconv"
 )
@@ -38,17 +40,16 @@ func (e *Environment) GetString(str string) (string, error) {
 	if str == "" {
 		return "", nil
 	}
-	expressionStringRegex.ReplaceAllStringFunc(str, func(s string) string {
+	return expressionStringRegex.ReplaceAllStringFunc(str, func(s string) string {
 		value, err := e.Eval(str[2 : len(str)-2])
-		if err != nil {
-			return str
+		if err == nil && value != nil {
+			return string(value.ToString())
 		}
 		if value == nil {
 			return ""
 		}
 		return string(value.ToString())
-	})
-	return str, nil
+	}), nil
 }
 
 func (e *Environment) Verify(expression string) (err error) {
@@ -143,12 +144,47 @@ func (v EString) ToString() EString {
 	return v
 }
 
+/* EBytes */
+
 type EBytes []byte
+
+func (v EBytes) Get(name string) (EValue, error) {
+	switch name {
+	case "bcontains":
+		return &ebytesBcontains{b: v}, nil
+	}
+	panic("implement me")
+}
 
 func (v EBytes) ToString() EString {
 	return EString(v)
 }
 
+type ebytesBcontains struct {
+	b EBytes
+}
+
+func (e ebytesBcontains) Call(args []EValue) (EValue, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("expect one argument, got %d", len(args))
+	}
+	arg := args[0]
+
+	switch arg.(type) {
+	case EBytes:
+		return EBool(bytes.Contains(e.b, arg.(EBytes))), nil
+	default:
+		return nil, fmt.Errorf("expect EBytes, got %s", reflect.TypeOf(arg))
+	}
+}
+
+func (e ebytesBcontains) ToString() EString {
+	panic("implement me")
+}
+
+/* EBytes */
+
 type EObject interface {
 	EValue
+	Get(name string) (EValue, error)
 }
