@@ -13,6 +13,8 @@ import (
 	"strings"
 )
 
+const defaultUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36"
+
 var httpMethods = []string{
 	"OPTIONS",
 	"GET",
@@ -107,6 +109,7 @@ func (h *HttpTransport) Do(ctx context.Context, dsl *dsl.Request) (Response, err
 	}
 	request, err := http.NewRequestWithContext(ctx, dsl.Method, h.url+pathStr, body)
 
+	request.Header.Set("User-Agent", defaultUserAgent)
 	for k, v := range h.headers {
 		request.Header.Set(k, v)
 	}
