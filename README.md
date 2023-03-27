@@ -49,7 +49,7 @@ Flags:
 
 
 ```
-name: poc-yaml-alibaba-nacos-v1-auth-bypass
+name: poc-yaml-demo
 manual: true
 transport: http
 set:
@@ -79,4 +79,4 @@ detail:
 
 # 问题
 
-1. 犹豫暂未实现反连功能，所以使用反连的poc会报`error - 'newReverse' undefined` 错误
+1. 由于暂未实现反连功能，所以使用反连的poc会报`error - 'newReverse' undefined` 错误
