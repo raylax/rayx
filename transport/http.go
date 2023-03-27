@@ -3,7 +3,6 @@ package transport
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
 	"github.com/raylax/rayx/dsl"
 	"github.com/raylax/rayx/expression"
 	"github.com/samber/lo"
@@ -32,6 +31,10 @@ type HttpResponse struct {
 	err     error
 	data    expression.EBytes
 	headers *headersMap
+}
+
+func (h *HttpResponse) Keys() []string {
+	panic("implement me")
 }
 
 func (h *HttpResponse) Get(name string) (expression.EValue, error) {
@@ -188,6 +191,10 @@ func (p *httpCookieJar) Cookies(u *url.URL) []*http.Cookie {
 
 type headersMap map[string]expression.EValue
 
+func (m headersMap) Keys() []string {
+	return lo.Keys(m)
+}
+
 func (m headersMap) ToString() expression.EString {
 	return "headersMap"
 }
@@ -200,7 +207,7 @@ func (m headersMap) Get(name string) (expression.EValue, error) {
 	if value, ok := m[m.normalizeName(name)]; ok {
 		return value, nil
 	}
-	return nil, fmt.Errorf("'%s' undefined", name)
+	return expression.EString(""), nil
 }
 
 func (m headersMap) normalizeName(name string) string {

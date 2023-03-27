@@ -32,8 +32,10 @@ func (e *evaluator) Visit(tree antlr.ParseTree) any {
 		return nil
 	}
 	switch tree.(type) {
-	case *PlusExpressionContext:
-		return e.visitPlusExpression(tree.(*PlusExpressionContext))
+	case *AdditiveExpressionContext:
+		return e.visitAdditiveExpressionContext(tree.(*AdditiveExpressionContext))
+	case *MultiplicativeExpressionContext:
+		return e.visitMultiplicativeExpressionContext(tree.(*MultiplicativeExpressionContext))
 	case *ConstExpressionContext:
 		return e.Visit(tree.(*ConstExpressionContext).ExpressionConst())
 	case *IntegerLiteralContext:
@@ -60,6 +62,10 @@ func (e *evaluator) Visit(tree antlr.ParseTree) any {
 		return e.visitLogicalOrExpressionContext(tree.(*LogicalOrExpressionContext))
 	case *ParenExpressionContext:
 		return e.visitParenExpressionContext(tree.(*ParenExpressionContext))
+	case *InExpressionContext:
+		return e.visitInExpressionContext(tree.(*InExpressionContext))
+	case *NotExpressionContext:
+		return e.visitNotExpressionContext(tree.(*NotExpressionContext))
 	}
 	panic(reflect.TypeOf(tree))
 }
@@ -181,21 +187,59 @@ func (e *evaluator) visitBooleanLiteral(n antlr.TerminalNode) any {
 	return EBool(false)
 }
 
-func (e *evaluator) visitPlusExpression(c *PlusExpressionContext) any {
+func (e *evaluator) visitAdditiveExpressionContext(c *AdditiveExpressionContext) any {
 	left := e.Visit(c.ExpressionSingle(0))
 	right := e.Visit(c.ExpressionSingle(1))
 	if reflect.TypeOf(left) != reflect.TypeOf(right) {
-		return e.Error(errors.New(fmt.Sprintf("%s + %s", reflect.TypeOf(left), reflect.TypeOf(right))))
+		return e.Error(errors.New(fmt.Sprintf("%s <OP> %s", reflect.TypeOf(left), reflect.TypeOf(right))))
 	}
-	switch left.(type) {
-	case EInt:
-		return left.(EInt) + right.(EInt)
-	case EFloat:
-		return left.(EFloat) + right.(EFloat)
-	case EString:
-		return left.(EString) + right.(EString)
-	case EBytes:
-		return append(left.(EBytes), right.(EBytes)...)
+
+	switch {
+	case c.PLUS() != nil:
+		switch left.(type) {
+		case EInt:
+			return eValuePlus[EInt](left, right)
+		case EFloat:
+			return eValuePlus[EFloat](left, right)
+		case EString:
+			return eValuePlus[EString](left, right)
+		case EBytes:
+			return append(left.(EBytes), right.(EBytes)...)
+		}
+	case c.MINUS() != nil:
+		switch left.(type) {
+		case EInt:
+			return eValueMinus[EInt](left, right)
+		case EFloat:
+			return eValueMinus[EFloat](left, right)
+		}
+	}
+	panic("unreached code")
+}
+
+func (e *evaluator) visitMultiplicativeExpressionContext(c *MultiplicativeExpressionContext) any {
+
+	left := e.Visit(c.ExpressionSingle(0))
+	right := e.Visit(c.ExpressionSingle(1))
+	if reflect.TypeOf(left) != reflect.TypeOf(right) {
+		return e.Error(errors.New(fmt.Sprintf("%s <OP> %s", reflect.TypeOf(left), reflect.TypeOf(right))))
+	}
+
+	switch {
+	case c.MULTIPLY() != nil:
+		switch left.(type) {
+		case EInt:
+			return eValueMultiply[EInt](left, right)
+		case EFloat:
+			return eValueMultiply[EFloat](left, right)
+		}
+	case c.DIVIDE() != nil:
+		switch left.(type) {
+		case EInt:
+			return eValueDivide[EInt](left, right)
+		case EFloat:
+			return eValueDivide[EFloat](left, right)
+		}
 	}
 	panic("unreached code")
 }
@@ -207,27 +251,31 @@ func (e *evaluator) visitEqualityExpressionContext(c *EqualityExpressionContext)
 }
 
 func (e *evaluator) visitLogicalAndExpressionContext(c *LogicalAndExpressionContext) any {
-	left, ok := e.Visit(c.ExpressionSingle(0)).(EBool)
+	left := e.Visit(c.ExpressionSingle(0))
+	leftValue, ok := left.(EBool)
 	if !ok {
-		return e.Error(fmt.Errorf("expect TBool, got %s", reflect.TypeOf(left)))
+		return e.Error(fmt.Errorf("expect EBool, got %s", reflect.TypeOf(left)))
 	}
-	right, ok := e.Visit(c.ExpressionSingle(1)).(EBool)
+	right := e.Visit(c.ExpressionSingle(1))
+	rightValue, ok := right.(EBool)
 	if !ok {
-		return e.Error(fmt.Errorf("expect TBool, got %s", reflect.TypeOf(right)))
+		return e.Error(fmt.Errorf("expect EBool, got %s", reflect.TypeOf(right)))
 	}
-	return left && right
+	return leftValue && rightValue
 }
 
 func (e *evaluator) visitLogicalOrExpressionContext(c *LogicalOrExpressionContext) any {
-	left, ok := e.Visit(c.ExpressionSingle(0)).(EBool)
+	left := e.Visit(c.ExpressionSingle(0))
+	leftValue, ok := left.(EBool)
 	if !ok {
-		return e.Error(fmt.Errorf("expect TBool, got %s", reflect.TypeOf(left)))
+		return e.Error(fmt.Errorf("expect EBool, got %s", reflect.TypeOf(left)))
 	}
-	right, ok := e.Visit(c.ExpressionSingle(1)).(EBool)
+	right := e.Visit(c.ExpressionSingle(1))
+	rightValue, ok := right.(EBool)
 	if !ok {
-		return e.Error(fmt.Errorf("expect TBool, got %s", reflect.TypeOf(right)))
+		return e.Error(fmt.Errorf("expect EBool, got %s", reflect.TypeOf(right)))
 	}
-	return left || right
+	return leftValue || rightValue
 }
 
 func (e *evaluator) visitMemberAccessExpressionContext(c *MemberAccessExpressionContext) any {
@@ -260,6 +308,39 @@ func (e *evaluator) visitParenExpressionContext(c *ParenExpressionContext) any {
 	return e.Visit(c.ExpressionSingle())
 }
 
+func (e *evaluator) visitInExpressionContext(c *InExpressionContext) any {
+
+	left := e.Visit(c.ExpressionSingle(0))
+	if e.err != nil {
+		return nil
+	}
+	key, ok := left.(EString)
+	if !ok {
+		return e.Error(fmt.Errorf("expect EString, got %s", reflect.TypeOf(left)))
+	}
+
+	right := e.Visit(c.ExpressionSingle(1))
+	if e.err != nil {
+		return nil
+	}
+	object, ok := right.(EObject)
+	if !ok {
+		return e.Error(fmt.Errorf("expect EObject, got %s", reflect.TypeOf(right)))
+	}
+
+	return EBool(lo.Contains(object.Keys(), string(key)))
+
+}
+
+func (e *evaluator) visitNotExpressionContext(c *NotExpressionContext) any {
+	expr := e.Visit(c.ExpressionSingle())
+	value, ok := expr.(EBool)
+	if !ok {
+		return e.Error(fmt.Errorf("expect EBool, got %s", reflect.TypeOf(expr)))
+	}
+	return !value
+}
+
 func (e *evaluator) Error(err error) any {
 	if e.err == nil {
 		e.err = err
@@ -277,4 +358,20 @@ func (e *evaluator) VisitTerminal(node antlr.TerminalNode) any {
 
 func (e *evaluator) VisitErrorNode(node antlr.ErrorNode) any {
 	panic("implement me")
+}
+
+func eValuePlus[T EInt | EFloat | EString](left any, right any) T {
+	return left.(T) + right.(T)
+}
+
+func eValueMinus[T EInt | EFloat](left any, right any) T {
+	return left.(T) - right.(T)
+}
+
+func eValueMultiply[T EInt | EFloat](left any, right any) T {
+	return left.(T) * right.(T)
+}
+
+func eValueDivide[T EInt | EFloat](left any, right any) T {
+	return left.(T) / right.(T)
 }

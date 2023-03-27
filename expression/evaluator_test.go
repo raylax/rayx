@@ -46,8 +46,20 @@ func Test_evaluator_Visit(t *testing.T) {
 			want:       EInt(3),
 		},
 		{
+			expression: "1 * 2",
+			want:       EInt(2),
+		},
+		{
+			expression: "4 / 2",
+			want:       EInt(2),
+		},
+		{
 			expression: "'1' + '2'",
 			want:       EString("12"),
+		},
+		{
+			expression: "!true",
+			want:       EBool(false),
 		},
 		{
 			expression: "1.0 + 2.0",

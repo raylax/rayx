@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/raylax/rayx/cmd"
 	"github.com/raylax/rayx/dsl"
 	"github.com/raylax/rayx/expression"
 	"github.com/raylax/rayx/transport"
+	"time"
 )
 
 type State string
@@ -21,14 +21,24 @@ const (
 type PocExecutor struct {
 }
 
-func (e *PocExecutor) Execute(config *cmd.Config, dsl dsl.Poc) (State, error) {
+func NewPocExecutor() *PocExecutor {
+	return &PocExecutor{}
+}
+
+func (e *PocExecutor) Execute(config *Config, dsl *dsl.Poc) (State, error) {
 	if dsl.Transport != "http" {
 		return StateError, errors.New("unsupported transport " + dsl.Transport)
 	}
 
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.Timeout)*time.Second)
+	defer cancel()
 
-	set := NewSet(*dsl.Set)
+	var set *Set
+	if dsl.Set == nil {
+		set = NewSet(nil)
+	} else {
+		set = NewSet(*dsl.Set)
+	}
 
 	outputs := &expression.MapVars{}
 	env := expression.NewEnvironment(ctx, set, outputs)
@@ -69,7 +79,7 @@ func (e *PocExecutor) Execute(config *cmd.Config, dsl dsl.Poc) (State, error) {
 			}
 		}
 	default:
-		return StateError, fmt.Errorf("expect TBool, got %v", value)
+		return StateError, fmt.Errorf("expect EBool, got %v", value)
 	}
 }
 
@@ -105,9 +115,10 @@ func (h *httpRequestFunc) Call(args []expression.EValue) (expression.EValue, err
 		for key, expr := range *h.output {
 			value, err := h.env.EvalWithVars(expr, vars)
 			if err != nil {
-				return nil, err
+				(*h.outputs)[key] = expression.EString("")
+			} else {
+				(*h.outputs)[key] = value
 			}
-			(*h.outputs)[key] = value
 		}
 	}
 

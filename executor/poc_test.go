@@ -2,16 +2,15 @@ package executor
 
 import (
 	"fmt"
-	"github.com/raylax/rayx/cmd"
 	"github.com/raylax/rayx/dsl"
 	"testing"
 )
 
 func TestPocExecutor_ExecuteUnsupportedTransport(t *testing.T) {
 	executor := &PocExecutor{}
-	config := &cmd.Config{}
+	config := &Config{}
 
-	d := dsl.Poc{
+	d := &dsl.Poc{
 		Transport:  "ssh",
 		Set:        nil,
 		Rules:      nil,
@@ -27,13 +26,14 @@ func TestPocExecutor_ExecuteUnsupportedTransport(t *testing.T) {
 func TestPocExecutor_Execute(t *testing.T) {
 
 	tests := []struct {
-		config *cmd.Config
+		config *Config
 		d      dsl.Poc
 		state  State
 		err    bool
 	}{
 		{
-			config: &cmd.Config{
+			config: &Config{
+				Timeout: 30,
 				Url:     "https://httpbin.org",
 				Headers: nil,
 				Cookies: nil,
@@ -75,7 +75,7 @@ func TestPocExecutor_Execute(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("case-%d", i), func(t *testing.T) {
 			executor := &PocExecutor{}
-			state, err := executor.Execute(tt.config, tt.d)
+			state, err := executor.Execute(tt.config, &tt.d)
 			if tt.err && err == nil {
 				t.Errorf("expect error")
 			}

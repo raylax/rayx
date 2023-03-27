@@ -5,16 +5,19 @@ expression
     ;
 
 expressionSingle
-    : expressionConst                                   # ConstExpression
-    | Identifier                                        # IdentifierAccessExpression
-    | '(' expressionSingle ')'                          # ParenExpression
-    | expressionSingle expressionMember                 # MemberAccessExpression
-    | expressionSingle '[' IntegerLiteral ']'           # ArrayAccessExpression
-    | expressionSingle '(' expressionArguments ')'      # FunctionCallExpression
-    | expressionSingle '+' expressionSingle             # PlusExpression
-    | expressionSingle ('==' | '!=') expressionSingle   # EqualityExpression
-    | expressionSingle '&&' expressionSingle            # LogicalAndExpression
-    | expressionSingle '||' expressionSingle            # LogicalOrExpression
+    : expressionConst                                       # ConstExpression
+    | Identifier                                            # IdentifierAccessExpression
+    | '(' expressionSingle ')'                              # ParenExpression
+    | expressionSingle expressionMember                     # MemberAccessExpression
+    | expressionSingle '[' IntegerLiteral ']'               # ArrayAccessExpression
+    | expressionSingle '(' expressionArguments ')'          # FunctionCallExpression
+    | '!' expressionSingle                                  # NotExpression
+    | expressionSingle ('+' | '-') expressionSingle         # AdditiveExpression
+    | expressionSingle ('*' | '/') expressionSingle         # MultiplicativeExpression
+    | expressionSingle ('==' | '!=') expressionSingle       # EqualityExpression
+    | expressionSingle 'in' expressionSingle                # InExpression
+    | expressionSingle '&&' expressionSingle                # LogicalAndExpression
+    | expressionSingle '||' expressionSingle                # LogicalOrExpression
     ;
 
 expressionMember
@@ -48,6 +51,11 @@ LBRACK : '[';
 RBRACK : ']';
 LPAREN : '(';
 RPAREN : ')';
+
+PLUS: '+';
+MINUS: '-';
+MULTIPLY : '*';
+DIVIDE : '/';
 
 EQUAL : '==';
 NOTEQUAL : '!=';

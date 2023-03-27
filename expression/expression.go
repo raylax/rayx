@@ -10,11 +10,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
+	"github.com/samber/lo"
 	"hash"
 	"net/url"
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type Environment struct {
@@ -26,6 +28,8 @@ type Environment struct {
 var builtin = map[string]EFunction{
 	"bytes":           &eFunctionToBytes{},
 	"string":          &eFunctionToString{},
+	"substr":          &eFunctionSubstr{},
+	"sleep":           &eFunctionSleep{},
 	"randomInt":       &eFunctionRandomInt{},
 	"randomLowercase": &eFunctionRandomAlpha{upper: false},
 	"randomUppercase": &eFunctionRandomAlpha{upper: true},
@@ -67,7 +71,7 @@ var builtin = map[string]EFunction{
 	}},
 }
 
-var expressionStringRegex = regexp.MustCompile(`\{\{.*?\}\}`)
+var expressionStringRegex = regexp.MustCompile(`\{\{[^\{\}]+?\}\}`)
 
 func NewEnvironment(context context.Context, vars ...Vars) *Environment {
 	if vars == nil || len(vars) == 0 {
@@ -186,6 +190,10 @@ func (v EBool) ToString() EString {
 
 type EString string
 
+func (v EString) Keys() []string {
+	panic("implement me")
+}
+
 func (v EString) ToString() EString {
 	return v
 }
@@ -196,7 +204,72 @@ func (v EString) Get(name string) (EValue, error) {
 		return &estringSubmatch{expr: string(v)}, nil
 	case "submatch":
 		return &estringSubmatch{expr: string(v)}, nil
+	case "bmatches":
+		return &estringMatchs{expr: string(v)}, nil
+	case "matches":
+		return &estringMatchs{expr: string(v)}, nil
+	case "contains":
+		return &estringContains{v: v}, nil
+	case "icontains":
+		return &estringContains{v: v, ci: true}, nil
 	}
+	panic("implement me - " + name)
+}
+
+type estringContains struct {
+	v  EString
+	ci bool
+}
+
+func (e estringContains) Call(args []EValue) (EValue, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("expect one argument, got %d", len(args))
+	}
+	arg := args[0]
+
+	switch arg.(type) {
+	case EString:
+		str := string(e.v)
+		substr := string(arg.(EString))
+		if e.ci {
+			return EBool(strings.Contains(strings.ToLower(str), strings.ToLower(substr))), nil
+		} else {
+			return EBool(strings.Contains(str, substr)), nil
+		}
+	default:
+		return nil, fmt.Errorf("expect EString, got %s", reflect.TypeOf(arg))
+	}
+}
+
+func (e estringContains) ToString() EString {
+	panic("implement me")
+}
+
+type estringMatchs struct {
+	expr string
+}
+
+func (e estringMatchs) Call(args []EValue) (EValue, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("expect one argument, got %d", len(args))
+	}
+	regex, err := regexp.Compile(e.expr)
+	if err != nil {
+		return nil, err
+	}
+	arg := args[0]
+
+	switch arg.(type) {
+	case EBytes:
+		return EBool(regex.Match(arg.(EBytes))), nil
+	case EString:
+		return EBool(regex.MatchString(string(arg.(EString)))), nil
+	default:
+		return nil, fmt.Errorf("expect EBytes,EString, got %s", reflect.TypeOf(arg))
+	}
+}
+
+func (e estringSubmatch) ToString() EString {
 	panic("implement me")
 }
 
@@ -234,10 +307,17 @@ func (e estringSubmatch) Call(args []EValue) (EValue, error) {
 		}
 	}
 
+	// set default value
+	for _, key := range regex.SubexpNames() {
+		if _, err := obj.Get(key); err != nil {
+			obj.Set(key, EString(""))
+		}
+	}
+
 	return obj, nil
 }
 
-func (e estringSubmatch) ToString() EString {
+func (e estringMatchs) ToString() EString {
 	panic("implement me")
 }
 
@@ -247,10 +327,16 @@ func (e estringSubmatch) ToString() EString {
 
 type EBytes []byte
 
+func (v EBytes) Keys() []string {
+	panic("implement me")
+}
+
 func (v EBytes) Get(name string) (EValue, error) {
 	switch name {
 	case "bcontains":
-		return &ebytesBcontains{b: v}, nil
+		return &ebytesBcontains{b: v, ci: false}, nil
+	case "icontains":
+		return &ebytesBcontains{b: v, ci: true}, nil
 	}
 	panic("implement me")
 }
@@ -260,7 +346,8 @@ func (v EBytes) ToString() EString {
 }
 
 type ebytesBcontains struct {
-	b EBytes
+	b  EBytes
+	ci bool
 }
 
 func (e ebytesBcontains) Call(args []EValue) (EValue, error) {
@@ -271,7 +358,11 @@ func (e ebytesBcontains) Call(args []EValue) (EValue, error) {
 
 	switch arg.(type) {
 	case EBytes:
-		return EBool(bytes.Contains(e.b, arg.(EBytes))), nil
+		if e.ci {
+			return EBool(bytes.Contains(bytes.ToLower(e.b), bytes.ToLower(arg.(EBytes)))), nil
+		} else {
+			return EBool(bytes.Contains(e.b, arg.(EBytes))), nil
+		}
 	default:
 		return nil, fmt.Errorf("expect EBytes, got %s", reflect.TypeOf(arg))
 	}
@@ -286,9 +377,14 @@ func (e ebytesBcontains) ToString() EString {
 type EObject interface {
 	EValue
 	Get(name string) (EValue, error)
+	Keys() []string
 }
 
 type MapObject map[string]EValue
+
+func (m MapObject) Keys() []string {
+	return lo.Keys(m)
+}
 
 func (m MapObject) ToString() EString {
 	return "MapObject"

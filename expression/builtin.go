@@ -6,6 +6,7 @@ import (
 	"hash"
 	"math/rand"
 	"reflect"
+	"time"
 )
 
 type eFunctionToString struct {
@@ -49,6 +50,27 @@ func (e eFunctionToBytes) Call(args []EValue) (EValue, error) {
 	default:
 		return nil, fmt.Errorf("expect EString, got %s", reflect.TypeOf(arg))
 	}
+}
+
+type eFunctionSleep struct {
+}
+
+func (e eFunctionSleep) ToString() EString {
+	return "Sleep"
+}
+
+func (e eFunctionSleep) Call(args []EValue) (EValue, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("expect one argument, got %d", len(args))
+	}
+
+	second, ok := args[0].(EInt)
+	if !ok {
+		return nil, fmt.Errorf("argument 1 expect EInt, got %s", reflect.TypeOf(args[0]))
+	}
+
+	time.Sleep(time.Duration(second) * time.Second)
+	return EBool(true), nil
 }
 
 type eFunctionRandomInt struct {
@@ -147,4 +169,33 @@ func (e eFunctionCodec) Call(args []EValue) (EValue, error) {
 		return nil, fmt.Errorf("expect one argument, got %d", len(args))
 	}
 	return e.fun(args[0])
+}
+
+type eFunctionSubstr struct {
+}
+
+func (e eFunctionSubstr) ToString() EString {
+	return "substr"
+}
+
+func (e eFunctionSubstr) Call(args []EValue) (EValue, error) {
+	if len(args) != 3 {
+		return nil, fmt.Errorf("expect 3 argument, got %d", len(args))
+	}
+
+	value, ok := args[0].(EString)
+	if !ok {
+		return nil, fmt.Errorf("argument 1 expect EString, got %s", reflect.TypeOf(args[0]))
+	}
+
+	start, ok := args[1].(EInt)
+	if !ok {
+		return nil, fmt.Errorf("argument 2 expect EInt, got %s", reflect.TypeOf(args[1]))
+	}
+	end, ok := args[2].(EInt)
+	if !ok {
+		return nil, fmt.Errorf("argument 3 expect EInt, got %s", reflect.TypeOf(args[2]))
+	}
+
+	return EString(string(value)[start:end]), nil
 }

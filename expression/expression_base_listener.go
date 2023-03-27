@@ -26,17 +26,17 @@ func (s *BaseExpressionListener) EnterExpression(ctx *ExpressionContext) {}
 // ExitExpression is called when production expression is exited.
 func (s *BaseExpressionListener) ExitExpression(ctx *ExpressionContext) {}
 
+// EnterAdditiveExpression is called when production AdditiveExpression is entered.
+func (s *BaseExpressionListener) EnterAdditiveExpression(ctx *AdditiveExpressionContext) {}
+
+// ExitAdditiveExpression is called when production AdditiveExpression is exited.
+func (s *BaseExpressionListener) ExitAdditiveExpression(ctx *AdditiveExpressionContext) {}
+
 // EnterMemberAccessExpression is called when production MemberAccessExpression is entered.
 func (s *BaseExpressionListener) EnterMemberAccessExpression(ctx *MemberAccessExpressionContext) {}
 
 // ExitMemberAccessExpression is called when production MemberAccessExpression is exited.
 func (s *BaseExpressionListener) ExitMemberAccessExpression(ctx *MemberAccessExpressionContext) {}
-
-// EnterPlusExpression is called when production PlusExpression is entered.
-func (s *BaseExpressionListener) EnterPlusExpression(ctx *PlusExpressionContext) {}
-
-// ExitPlusExpression is called when production PlusExpression is exited.
-func (s *BaseExpressionListener) ExitPlusExpression(ctx *PlusExpressionContext) {}
 
 // EnterLogicalAndExpression is called when production LogicalAndExpression is entered.
 func (s *BaseExpressionListener) EnterLogicalAndExpression(ctx *LogicalAndExpressionContext) {}
@@ -50,11 +50,29 @@ func (s *BaseExpressionListener) EnterConstExpression(ctx *ConstExpressionContex
 // ExitConstExpression is called when production ConstExpression is exited.
 func (s *BaseExpressionListener) ExitConstExpression(ctx *ConstExpressionContext) {}
 
+// EnterInExpression is called when production InExpression is entered.
+func (s *BaseExpressionListener) EnterInExpression(ctx *InExpressionContext) {}
+
+// ExitInExpression is called when production InExpression is exited.
+func (s *BaseExpressionListener) ExitInExpression(ctx *InExpressionContext) {}
+
 // EnterLogicalOrExpression is called when production LogicalOrExpression is entered.
 func (s *BaseExpressionListener) EnterLogicalOrExpression(ctx *LogicalOrExpressionContext) {}
 
 // ExitLogicalOrExpression is called when production LogicalOrExpression is exited.
 func (s *BaseExpressionListener) ExitLogicalOrExpression(ctx *LogicalOrExpressionContext) {}
+
+// EnterNotExpression is called when production NotExpression is entered.
+func (s *BaseExpressionListener) EnterNotExpression(ctx *NotExpressionContext) {}
+
+// ExitNotExpression is called when production NotExpression is exited.
+func (s *BaseExpressionListener) ExitNotExpression(ctx *NotExpressionContext) {}
+
+// EnterFunctionCallExpression is called when production FunctionCallExpression is entered.
+func (s *BaseExpressionListener) EnterFunctionCallExpression(ctx *FunctionCallExpressionContext) {}
+
+// ExitFunctionCallExpression is called when production FunctionCallExpression is exited.
+func (s *BaseExpressionListener) ExitFunctionCallExpression(ctx *FunctionCallExpressionContext) {}
 
 // EnterParenExpression is called when production ParenExpression is entered.
 func (s *BaseExpressionListener) EnterParenExpression(ctx *ParenExpressionContext) {}
@@ -68,17 +86,18 @@ func (s *BaseExpressionListener) EnterEqualityExpression(ctx *EqualityExpression
 // ExitEqualityExpression is called when production EqualityExpression is exited.
 func (s *BaseExpressionListener) ExitEqualityExpression(ctx *EqualityExpressionContext) {}
 
+// EnterMultiplicativeExpression is called when production MultiplicativeExpression is entered.
+func (s *BaseExpressionListener) EnterMultiplicativeExpression(ctx *MultiplicativeExpressionContext) {
+}
+
+// ExitMultiplicativeExpression is called when production MultiplicativeExpression is exited.
+func (s *BaseExpressionListener) ExitMultiplicativeExpression(ctx *MultiplicativeExpressionContext) {}
+
 // EnterArrayAccessExpression is called when production ArrayAccessExpression is entered.
 func (s *BaseExpressionListener) EnterArrayAccessExpression(ctx *ArrayAccessExpressionContext) {}
 
 // ExitArrayAccessExpression is called when production ArrayAccessExpression is exited.
 func (s *BaseExpressionListener) ExitArrayAccessExpression(ctx *ArrayAccessExpressionContext) {}
-
-// EnterFunctionCallExpression is called when production FunctionCallExpression is entered.
-func (s *BaseExpressionListener) EnterFunctionCallExpression(ctx *FunctionCallExpressionContext) {}
-
-// ExitFunctionCallExpression is called when production FunctionCallExpression is exited.
-func (s *BaseExpressionListener) ExitFunctionCallExpression(ctx *FunctionCallExpressionContext) {}
 
 // EnterIdentifierAccessExpression is called when production IdentifierAccessExpression is entered.
 func (s *BaseExpressionListener) EnterIdentifierAccessExpression(ctx *IdentifierAccessExpressionContext) {
