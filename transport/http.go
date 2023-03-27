@@ -24,18 +24,22 @@ var httpMethods = []string{
 	"DELETE",
 	"TRACE",
 	"CONNECT",
+	"MOVE",
 }
 
 type HttpResponse struct {
-	raw  *http.Response
-	err  error
-	data expression.EBytes
+	raw     *http.Response
+	err     error
+	data    expression.EBytes
+	headers *headersMap
 }
 
-func (h HttpResponse) Get(name string) (expression.EValue, error) {
+func (h *HttpResponse) Get(name string) (expression.EValue, error) {
 	switch name {
 	case "status":
 		return expression.EInt(h.raw.StatusCode), nil
+	case "headers":
+		return h.getHeaders(), nil
 	case "body":
 		if h.err != nil {
 			return nil, h.err
@@ -50,10 +54,21 @@ func (h HttpResponse) Get(name string) (expression.EValue, error) {
 		}
 		return h.data, nil
 	}
-	return nil, fmt.Errorf("'%s' undefined", name)
+	headers := h.getHeaders()
+	return headers.Get(name)
 }
 
-func (h HttpResponse) ToString() expression.EString {
+func (h *HttpResponse) getHeaders() *headersMap {
+	if h.headers == nil {
+		h.headers = &headersMap{}
+		for key, value := range h.raw.Header {
+			h.headers.Set(key, expression.EString(value[0]))
+		}
+	}
+	return h.headers
+}
+
+func (h *HttpResponse) ToString() expression.EString {
 	return "<http-response>"
 }
 
@@ -169,4 +184,25 @@ func (p *httpCookieJar) SetCookies(u *url.URL, cookies []*http.Cookie) {
 
 func (p *httpCookieJar) Cookies(u *url.URL) []*http.Cookie {
 	return p.jar[u.Host]
+}
+
+type headersMap map[string]expression.EValue
+
+func (m headersMap) ToString() expression.EString {
+	return "headersMap"
+}
+
+func (m headersMap) Set(name string, value expression.EValue) {
+	m[m.normalizeName(name)] = value
+}
+
+func (m headersMap) Get(name string) (expression.EValue, error) {
+	if value, ok := m[m.normalizeName(name)]; ok {
+		return value, nil
+	}
+	return nil, fmt.Errorf("'%s' undefined", name)
+}
+
+func (m headersMap) normalizeName(name string) string {
+	return strings.ReplaceAll(strings.ToLower(name), "-", "_")
 }

@@ -62,5 +62,5 @@ func TestSet_GetValueUndefined(t *testing.T) {
 }
 
 func newSetEnv(dsl dsl.Set) (*Set, *expression.Environment) {
-	return NewSet(dsl), expression.NewEnvironment(context.Background(), nil)
+	return NewSet(dsl), expression.NewEnvironment(context.Background())
 }

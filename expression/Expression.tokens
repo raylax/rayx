@@ -16,6 +16,7 @@ Identifier=15
 IntegerLiteral=16
 FloatingPointLiteral=17
 StringLiteral=18
+Whitespace=19
 '+'=1
 '&&'=2
 '||'=3

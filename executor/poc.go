@@ -30,13 +30,16 @@ func (e *PocExecutor) Execute(config *cmd.Config, dsl dsl.Poc) (State, error) {
 
 	set := NewSet(*dsl.Set)
 
-	env := expression.NewEnvironment(ctx, set)
+	outputs := &expression.MapVars{}
+	env := expression.NewEnvironment(ctx, set, outputs)
 	t := transport.NewHttpTransport(env, config.Url, config.Headers, config.Cookies)
 
 	var rules = Rules{}
 	for name, rule := range *dsl.Rules {
 		f := &httpRequestFunc{
 			expression: rule.Expression,
+			output:     rule.Output,
+			outputs:    outputs,
 			d:          rule.Request,
 			env:        env,
 			t:          t,
@@ -72,6 +75,8 @@ func (e *PocExecutor) Execute(config *cmd.Config, dsl dsl.Poc) (State, error) {
 
 type httpRequestFunc struct {
 	d          *dsl.Request
+	output     *dsl.Output
+	outputs    *expression.MapVars
 	expression string
 	env        *expression.Environment
 	t          *transport.HttpTransport
@@ -82,16 +87,28 @@ func (h *httpRequestFunc) ToString() expression.EString {
 }
 
 func (h *httpRequestFunc) Call(args []expression.EValue) (expression.EValue, error) {
+	// 发起request
 	response, err := h.t.Do(h.env.Context, h.d)
 	if err != nil {
 		return nil, err
 	}
 
-	value, err := h.env.EvalWithVars(h.expression, expression.MapVars{
-		"response": response,
-	})
+	vars := expression.MapVars{"response": response}
+
+	value, err := h.env.EvalWithVars(h.expression, vars)
 	if err != nil {
 		return nil, err
+	}
+
+	// 计算output
+	if h.output != nil {
+		for key, expr := range *h.output {
+			value, err := h.env.EvalWithVars(expr, vars)
+			if err != nil {
+				return nil, err
+			}
+			(*h.outputs)[key] = value
+		}
 	}
 
 	return value, nil

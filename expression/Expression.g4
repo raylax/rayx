@@ -82,6 +82,10 @@ StringLiteral
 	|   '\'' SingleStringCharacter* '\''
 	;
 
+Whitespace
+    : [ \t\r\n]+ -> channel(HIDDEN)
+    ;
+
 fragment
 DoubleStringCharacter
     : ~["\\\r\n]

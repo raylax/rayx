@@ -1,6 +1,9 @@
 package expression
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Vars interface {
 	GetValue(env *Environment, key string) (EValue, error)
@@ -15,6 +18,10 @@ func (m MapVars) GetValue(env *Environment, key string) (EValue, error) {
 	return nil, fmt.Errorf("'%s' undefined", key)
 }
 
+func (m MapVars) SetValue(key string, value EValue) {
+	m[key] = value
+}
+
 type combinedVars []Vars
 
 func (cv combinedVars) GetValue(env *Environment, key string) (EValue, error) {
@@ -24,9 +31,9 @@ func (cv combinedVars) GetValue(env *Environment, key string) (EValue, error) {
 		if err == nil {
 			return value, nil
 		}
-		if i == max {
+		if i == 0 || !strings.Contains(err.Error(), "undefined") {
 			return nil, err
 		}
 	}
-	panic("unreached code")
+	return nil, fmt.Errorf("'%s' undefined", key)
 }

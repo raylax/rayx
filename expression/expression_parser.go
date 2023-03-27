@@ -38,7 +38,7 @@ func expressionParserInit() {
 	staticData.symbolicNames = []string{
 		"", "", "", "", "", "", "DOT", "LBRACK", "RBRACK", "LPAREN", "RPAREN",
 		"EQUAL", "NOTEQUAL", "WhiteSpaces", "BooleanLiteral", "Identifier",
-		"IntegerLiteral", "FloatingPointLiteral", "StringLiteral",
+		"IntegerLiteral", "FloatingPointLiteral", "StringLiteral", "Whitespace",
 	}
 	staticData.ruleNames = []string{
 		"expression", "expressionSingle", "expressionMember", "expressionConst",
@@ -46,7 +46,7 @@ func expressionParserInit() {
 	}
 	staticData.predictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 18, 88, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+		4, 1, 19, 88, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
 		4, 2, 5, 7, 5, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		1, 3, 1, 23, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -140,6 +140,7 @@ const (
 	ExpressionParserIntegerLiteral       = 16
 	ExpressionParserFloatingPointLiteral = 17
 	ExpressionParserStringLiteral        = 18
+	ExpressionParserWhitespace           = 19
 )
 
 // ExpressionParser rules.

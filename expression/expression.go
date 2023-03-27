@@ -3,9 +3,15 @@ package expression
 import (
 	"bytes"
 	"context"
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
+	"hash"
+	"net/url"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -18,20 +24,58 @@ type Environment struct {
 }
 
 var builtin = map[string]EFunction{
-	"bytes":     &eFunctionToBytes{},
-	"string":    &eFunctionToString{},
-	"randomInt": &eFunctionRandomInt{},
+	"bytes":           &eFunctionToBytes{},
+	"string":          &eFunctionToString{},
+	"randomInt":       &eFunctionRandomInt{},
+	"randomLowercase": &eFunctionRandomAlpha{upper: false},
+	"randomUppercase": &eFunctionRandomAlpha{upper: true},
+	"md5": &eFunctionHash{h: func() hash.Hash {
+		return md5.New()
+	}},
+	"sha1": &eFunctionHash{h: func() hash.Hash {
+		return sha1.New()
+	}},
+	"sha256": &eFunctionHash{h: func() hash.Hash {
+		return sha256.New()
+	}},
+	"base64": &eFunctionCodec{fun: func(value EValue) (EValue, error) {
+		switch value.(type) {
+		case EBytes:
+			return EString(base64.StdEncoding.EncodeToString(value.(EBytes))), nil
+		case EString:
+			return EString(base64.StdEncoding.EncodeToString([]byte(value.(EString)))), nil
+		default:
+			return nil, fmt.Errorf("expect EString,EBytes, got %s", reflect.TypeOf(value))
+		}
+	}},
+	"urldecode": &eFunctionCodec{fun: func(value EValue) (EValue, error) {
+
+		var v string
+		switch value.(type) {
+		case EBytes:
+			v = string(value.(EBytes))
+		case EString:
+			v = string(value.(EString))
+		default:
+			return nil, fmt.Errorf("expect EString,EBytes, got %s", reflect.TypeOf(value))
+		}
+		decodedValue, err := url.QueryUnescape(v)
+		if err != nil {
+			return nil, err
+		}
+		return EString(decodedValue), err
+	}},
 }
 
 var expressionStringRegex = regexp.MustCompile(`\{\{.*?\}\}`)
 
-func NewEnvironment(context context.Context, vars Vars) *Environment {
-	if vars == nil {
-		vars = MapVars{}
+func NewEnvironment(context context.Context, vars ...Vars) *Environment {
+	if vars == nil || len(vars) == 0 {
+		vars = combinedVars{}
 	}
 	return &Environment{
 		builtin: builtin,
-		vars:    vars,
+		vars:    combinedVars(vars),
 		Context: context,
 	}
 }
@@ -41,7 +85,7 @@ func (e *Environment) GetString(str string) (string, error) {
 		return "", nil
 	}
 	return expressionStringRegex.ReplaceAllStringFunc(str, func(s string) string {
-		value, err := e.Eval(str[2 : len(str)-2])
+		value, err := e.Eval(s[2 : len(s)-2])
 		if err == nil && value != nil {
 			return string(value.ToString())
 		}
@@ -138,11 +182,66 @@ func (v EBool) ToString() EString {
 	return EString(strconv.FormatBool(bool(v)))
 }
 
+/* EString */
+
 type EString string
 
 func (v EString) ToString() EString {
 	return v
 }
+
+func (v EString) Get(name string) (EValue, error) {
+	switch name {
+	case "bsubmatch":
+		return &estringSubmatch{expr: string(v)}, nil
+	case "submatch":
+		return &estringSubmatch{expr: string(v)}, nil
+	}
+	panic("implement me")
+}
+
+type estringSubmatch struct {
+	expr string
+}
+
+func (e estringSubmatch) Call(args []EValue) (EValue, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("expect one argument, got %d", len(args))
+	}
+	regex, err := regexp.Compile(e.expr)
+	if err != nil {
+		return nil, err
+	}
+	arg := args[0]
+
+	var str string
+	switch arg.(type) {
+	case EBytes:
+		str = string(arg.(EBytes))
+	case EString:
+		str = string(arg.(EString))
+	default:
+		return nil, fmt.Errorf("expect EBytes,EString, got %s", reflect.TypeOf(arg))
+	}
+	obj := &MapObject{}
+	match := regex.FindStringSubmatch(str)
+
+	if match != nil {
+		for i, name := range regex.SubexpNames() {
+			if i != 0 && name != "" {
+				obj.Set(name, EString(match[i]))
+			}
+		}
+	}
+
+	return obj, nil
+}
+
+func (e estringSubmatch) ToString() EString {
+	panic("implement me")
+}
+
+/* EString */
 
 /* EBytes */
 
@@ -187,4 +286,21 @@ func (e ebytesBcontains) ToString() EString {
 type EObject interface {
 	EValue
 	Get(name string) (EValue, error)
+}
+
+type MapObject map[string]EValue
+
+func (m MapObject) ToString() EString {
+	return "MapObject"
+}
+
+func (m MapObject) Set(name string, value EValue) {
+	m[name] = value
+}
+
+func (m MapObject) Get(name string) (EValue, error) {
+	if value, ok := m[name]; ok {
+		return value, nil
+	}
+	return nil, fmt.Errorf("'%s' undefined", name)
 }

@@ -29,9 +29,8 @@ func TestPocExecutor_Execute(t *testing.T) {
 	tests := []struct {
 		config *cmd.Config
 		d      dsl.Poc
-
-		state State
-		err   bool
+		state  State
+		err    bool
 	}{
 		{
 			config: &cmd.Config{
@@ -42,10 +41,25 @@ func TestPocExecutor_Execute(t *testing.T) {
 			d: dsl.Poc{
 				Transport: "http",
 				Set: &dsl.Set{
-					"r1": "'/get'",
+					"r1": "base64('aaa/getaaaa')",
 				},
 				Rules: &dsl.Rules{
 					"r1": dsl.Rule{
+						Request: &dsl.Request{
+							Path: "/base64/{{r1}}",
+						},
+						Expression: `response.status == 200 && response.body.bcontains(bytes('aaa/getaaaa'))
+&& response.headers['content-type'] == 'text/html; charset=utf-8'
+&& response.headers['content_type'] == 'text/html; charset=utf-8'
+&& response.headers['Content-Type'] == 'text/html; charset=utf-8'
+&& response.content_type == 'text/html; charset=utf-8'
+`,
+						Output: &dsl.Output{
+							"search": `'aaa(?P<method>.*?)aaaa'.bsubmatch(response.body)`,
+							"method": `search['method']`,
+						},
+					},
+					"r2": dsl.Rule{
 						Request: &dsl.Request{
 							Path: "{{r1}}",
 						},
@@ -66,7 +80,7 @@ func TestPocExecutor_Execute(t *testing.T) {
 				t.Errorf("expect error")
 			}
 			if !tt.err && tt.state != state {
-				t.Errorf("expect %s, got %s", tt.state, state)
+				t.Errorf("expect %s, got %s - %v", tt.state, state, err)
 			}
 		})
 	}
