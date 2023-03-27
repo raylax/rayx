@@ -28,8 +28,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            rayx_darwin_amd64
-            rayx_darwin_arm64
-            rayx_linux_amd64
-            rayx_windows_amd64.exe
+          files: bin/*
