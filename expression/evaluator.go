@@ -256,6 +256,12 @@ func (e *evaluator) visitLogicalAndExpressionContext(c *LogicalAndExpressionCont
 	if !ok {
 		return e.Error(fmt.Errorf("expect EBool, got %s", reflect.TypeOf(left)))
 	}
+
+	// fast-return
+	if !leftValue {
+		return EBool(false)
+	}
+
 	right := e.Visit(c.ExpressionSingle(1))
 	rightValue, ok := right.(EBool)
 	if !ok {
@@ -270,6 +276,12 @@ func (e *evaluator) visitLogicalOrExpressionContext(c *LogicalOrExpressionContex
 	if !ok {
 		return e.Error(fmt.Errorf("expect EBool, got %s", reflect.TypeOf(left)))
 	}
+
+	// fast-return
+	if leftValue {
+		return EBool(true)
+	}
+
 	right := e.Visit(c.ExpressionSingle(1))
 	rightValue, ok := right.(EBool)
 	if !ok {
