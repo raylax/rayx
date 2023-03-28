@@ -46,7 +46,7 @@ Flags:
 
 # 工作原理
 使用语法分析器分析`expression`构造语法树以及上下文并执行，执行的过程是惰性的
-
+> 表达式语法描述`Expression.g4`是根据yaml分析出来的，不是很完善。写完之后才发现有现成的`cel-go`可用 :(
 
 ```
 name: poc-yaml-demo
